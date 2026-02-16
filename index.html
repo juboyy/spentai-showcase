@@ -1,17 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpentAI — Track Expenses by Text Message</title>
-    <meta name="description" content="SpentAI lets you track expenses instantly by sending a text or voice message. No app needed. Just text your spending and we handle the rest.">
+    <title>SpentAI — Registre Despesas por Mensagem de Texto</title>
+    <meta name="description"
+        content="SpentAI permite registrar despesas instantaneamente enviando uma mensagem de texto ou áudio. Sem app. Só mande sua despesa e a IA faz o resto.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
-        /* ===== RESET & BASE ===== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --bg-primary: #0a0a0f;
             --bg-secondary: #111118;
@@ -30,14 +39,16 @@
             --accent-red: #ff6b6b;
             --accent-blue: #4da6ff;
             --gradient-hero: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #74b9ff 100%);
-            --gradient-card: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(162,155,254,0.04));
-            --shadow-glow: 0 0 60px rgba(108,92,231,0.15);
+            --gradient-card: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(162, 155, 254, 0.04));
+            --shadow-glow: 0 0 60px rgba(108, 92, 231, 0.15);
             --radius: 16px;
             --radius-sm: 10px;
-            --radius-xs: 6px;
         }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg-primary);
@@ -46,7 +57,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== NOISE OVERLAY ===== */
         body::before {
             content: '';
             position: fixed;
@@ -56,8 +66,12 @@
             z-index: 999;
         }
 
-        /* ===== UTILITIES ===== */
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
         .badge {
             display: inline-flex;
             align-items: center;
@@ -69,18 +83,20 @@
             letter-spacing: 0.04em;
             text-transform: uppercase;
         }
+
         .badge-accent {
-            background: rgba(108,92,231,0.15);
+            background: rgba(108, 92, 231, 0.15);
             color: var(--accent-2);
-            border: 1px solid rgba(108,92,231,0.3);
+            border: 1px solid rgba(108, 92, 231, 0.3);
         }
+
         .badge-green {
             background: var(--accent-green-dim);
             color: var(--accent-green);
-            border: 1px solid rgba(0,214,143,0.3);
+            border: 1px solid rgba(0, 214, 143, 0.3);
         }
 
-        /* ===== NAVBAR ===== */
+        /* NAVBAR */
         nav {
             position: fixed;
             top: 0;
@@ -88,15 +104,17 @@
             right: 0;
             z-index: 100;
             padding: 16px 0;
-            background: rgba(10,10,15,0.8);
+            background: rgba(10, 10, 15, 0.8);
             backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(42,42,58,0.5);
+            border-bottom: 1px solid rgba(42, 42, 58, 0.5);
         }
+
         nav .container {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
+
         .logo {
             font-size: 1.3rem;
             font-weight: 800;
@@ -105,7 +123,13 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.02em;
         }
-        .nav-links { display: flex; gap: 32px; list-style: none; }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
@@ -113,7 +137,11 @@
             font-weight: 500;
             transition: color 0.2s;
         }
-        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
         .nav-status {
             display: flex;
             align-items: center;
@@ -121,6 +149,7 @@
             font-size: 0.8rem;
             color: var(--accent-green);
         }
+
         .nav-status::before {
             content: '';
             width: 8px;
@@ -129,17 +158,26 @@
             background: var(--accent-green);
             animation: pulse-dot 2s infinite;
         }
+
         @keyframes pulse-dot {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(0,214,143,0.6); }
-            50% { box-shadow: 0 0 0 6px rgba(0,214,143,0); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 214, 143, 0.6);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(0, 214, 143, 0);
+            }
         }
 
-        /* ===== HERO ===== */
+        /* HERO */
         .hero {
             padding: 160px 0 100px;
             text-align: center;
             position: relative;
         }
+
         .hero::before {
             content: '';
             position: absolute;
@@ -148,9 +186,10 @@
             transform: translateX(-50%);
             width: 800px;
             height: 800px;
-            background: radial-gradient(circle, rgba(108,92,231,0.12) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.12) 0%, transparent 60%);
             pointer-events: none;
         }
+
         .hero h1 {
             font-size: clamp(2.5rem, 6vw, 4.2rem);
             font-weight: 900;
@@ -158,11 +197,13 @@
             letter-spacing: -0.03em;
             margin-bottom: 24px;
         }
+
         .hero h1 .gradient-text {
             background: var(--gradient-hero);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .hero p {
             font-size: 1.15rem;
             color: var(--text-secondary);
@@ -170,6 +211,7 @@
             margin: 0 auto 40px;
             line-height: 1.7;
         }
+
         .hero-cta {
             display: inline-flex;
             align-items: center;
@@ -184,31 +226,35 @@
             cursor: pointer;
             text-decoration: none;
             transition: transform 0.2s, box-shadow 0.3s;
-            box-shadow: 0 4px 30px rgba(108,92,231,0.4);
-        }
-        .hero-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 40px rgba(108,92,231,0.55);
+            box-shadow: 0 4px 30px rgba(108, 92, 231, 0.4);
         }
 
-        /* ===== PHONE MOCKUP ===== */
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(108, 92, 231, 0.55);
+        }
+
+        /* PHONE MOCKUP */
         .phone-demo {
             margin: 60px auto 0;
             max-width: 380px;
             position: relative;
         }
+
         .phone-frame {
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: 36px;
             padding: 12px;
-            box-shadow: var(--shadow-glow), 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
         }
+
         .phone-screen {
             background: #1a1a2e;
             border-radius: 26px;
             overflow: hidden;
         }
+
         .phone-notch {
             width: 120px;
             height: 28px;
@@ -216,6 +262,7 @@
             border-radius: 0 0 16px 16px;
             margin: 0 auto;
         }
+
         .sms-thread {
             padding: 20px 16px;
             min-height: 360px;
@@ -223,6 +270,7 @@
             flex-direction: column;
             gap: 12px;
         }
+
         .sms-bubble {
             max-width: 80%;
             padding: 10px 14px;
@@ -231,66 +279,138 @@
             line-height: 1.5;
             animation: msg-appear 0.5s ease-out both;
         }
+
         .sms-sent {
             align-self: flex-end;
             background: #2563eb;
             color: white;
             border-bottom-right-radius: 4px;
         }
+
         .sms-received {
             align-self: flex-start;
             background: #2a2a3a;
             color: var(--text-primary);
             border-bottom-left-radius: 4px;
         }
-        .sms-bubble:nth-child(1) { animation-delay: 0.3s; }
-        .sms-bubble:nth-child(2) { animation-delay: 1.2s; }
-        .sms-bubble:nth-child(3) { animation-delay: 2.5s; }
-        .sms-bubble:nth-child(4) { animation-delay: 3.4s; }
-        .sms-bubble:nth-child(5) { animation-delay: 4.5s; }
-        .sms-bubble:nth-child(6) { animation-delay: 5.5s; }
-        @keyframes msg-appear {
-            from { opacity: 0; transform: translateY(10px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+
+        .sms-bubble:nth-child(1) {
+            animation-delay: 0.3s;
         }
+
+        .sms-bubble:nth-child(2) {
+            animation-delay: 1.2s;
+        }
+
+        .sms-bubble:nth-child(3) {
+            animation-delay: 2.5s;
+        }
+
+        .sms-bubble:nth-child(4) {
+            animation-delay: 3.4s;
+        }
+
+        .sms-bubble:nth-child(5) {
+            animation-delay: 4.5s;
+        }
+
+        .sms-bubble:nth-child(6) {
+            animation-delay: 5.5s;
+        }
+
+        @keyframes msg-appear {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .sms-audio {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .audio-wave {
             display: flex;
             align-items: center;
             gap: 2px;
             height: 24px;
         }
+
         .audio-wave span {
             display: block;
             width: 3px;
             border-radius: 3px;
-            background: rgba(255,255,255,0.7);
+            background: rgba(255, 255, 255, 0.7);
             animation: wave 1.2s ease-in-out infinite;
         }
-        .audio-wave span:nth-child(1) { height: 8px; animation-delay: 0s; }
-        .audio-wave span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
-        .audio-wave span:nth-child(3) { height: 10px; animation-delay: 0.2s; }
-        .audio-wave span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
-        .audio-wave span:nth-child(5) { height: 14px; animation-delay: 0.4s; }
-        .audio-wave span:nth-child(6) { height: 8px; animation-delay: 0.5s; }
-        .audio-wave span:nth-child(7) { height: 18px; animation-delay: 0.6s; }
-        .audio-wave span:nth-child(8) { height: 6px; animation-delay: 0.7s; }
-        @keyframes wave {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(0.5); }
+
+        .audio-wave span:nth-child(1) {
+            height: 8px;
+            animation-delay: 0s;
         }
 
-        /* ===== STATS ===== */
+        .audio-wave span:nth-child(2) {
+            height: 16px;
+            animation-delay: 0.1s;
+        }
+
+        .audio-wave span:nth-child(3) {
+            height: 10px;
+            animation-delay: 0.2s;
+        }
+
+        .audio-wave span:nth-child(4) {
+            height: 20px;
+            animation-delay: 0.3s;
+        }
+
+        .audio-wave span:nth-child(5) {
+            height: 14px;
+            animation-delay: 0.4s;
+        }
+
+        .audio-wave span:nth-child(6) {
+            height: 8px;
+            animation-delay: 0.5s;
+        }
+
+        .audio-wave span:nth-child(7) {
+            height: 18px;
+            animation-delay: 0.6s;
+        }
+
+        .audio-wave span:nth-child(8) {
+            height: 6px;
+            animation-delay: 0.7s;
+        }
+
+        @keyframes wave {
+
+            0%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            50% {
+                transform: scaleY(0.5);
+            }
+        }
+
+        /* STATS */
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             padding: 60px 0;
         }
+
         .stat-card {
             text-align: center;
             padding: 28px 16px;
@@ -299,10 +419,12 @@
             border-radius: var(--radius);
             transition: border-color 0.3s, transform 0.3s;
         }
+
         .stat-card:hover {
             border-color: var(--accent-1);
             transform: translateY(-4px);
         }
+
         .stat-number {
             font-size: 2.2rem;
             font-weight: 800;
@@ -310,6 +432,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .stat-label {
             font-size: 0.8rem;
             color: var(--text-secondary);
@@ -319,11 +442,12 @@
             font-weight: 500;
         }
 
-        /* ===== SECTION HEADERS ===== */
+        /* SECTION HEADERS */
         .section-header {
             text-align: center;
             margin-bottom: 56px;
         }
+
         .section-header h2 {
             font-size: 2.2rem;
             font-weight: 800;
@@ -331,13 +455,17 @@
             margin-top: 12px;
         }
 
-        /* ===== HOW IT WORKS ===== */
-        .how-section { padding: 80px 0; }
+        /* HOW IT WORKS */
+        .how-section {
+            padding: 80px 0;
+        }
+
         .steps {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 28px;
         }
+
         .step-card {
             background: var(--gradient-card);
             border: 1px solid var(--border);
@@ -347,10 +475,12 @@
             overflow: hidden;
             transition: border-color 0.3s, transform 0.3s;
         }
+
         .step-card:hover {
-            border-color: rgba(108,92,231,0.5);
+            border-color: rgba(108, 92, 231, 0.5);
             transform: translateY(-4px);
         }
+
         .step-card::before {
             content: '';
             position: absolute;
@@ -362,12 +492,16 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        .step-card:hover::before { opacity: 1; }
+
+        .step-card:hover::before {
+            opacity: 1;
+        }
+
         .step-num {
             width: 44px;
             height: 44px;
             border-radius: 12px;
-            background: rgba(108,92,231,0.15);
+            background: rgba(108, 92, 231, 0.15);
             color: var(--accent-2);
             display: flex;
             align-items: center;
@@ -376,24 +510,30 @@
             font-size: 1.1rem;
             margin-bottom: 20px;
         }
+
         .step-card h3 {
             font-size: 1.15rem;
             font-weight: 700;
             margin-bottom: 10px;
         }
+
         .step-card p {
             color: var(--text-secondary);
             font-size: 0.9rem;
             line-height: 1.65;
         }
 
-        /* ===== TECH STACK ===== */
-        .tech-section { padding: 80px 0; }
+        /* TECH STACK */
+        .tech-section {
+            padding: 80px 0;
+        }
+
         .tech-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
+
         .tech-card {
             display: flex;
             align-items: flex-start;
@@ -404,7 +544,11 @@
             padding: 24px;
             transition: border-color 0.3s;
         }
-        .tech-card:hover { border-color: rgba(108,92,231,0.4); }
+
+        .tech-card:hover {
+            border-color: rgba(108, 92, 231, 0.4);
+        }
+
         .tech-icon {
             width: 48px;
             height: 48px;
@@ -415,19 +559,24 @@
             font-size: 1.4rem;
             flex-shrink: 0;
         }
+
         .tech-card h4 {
             font-size: 1rem;
             font-weight: 700;
             margin-bottom: 4px;
         }
+
         .tech-card p {
             font-size: 0.82rem;
             color: var(--text-secondary);
             line-height: 1.55;
         }
 
-        /* ===== ARCHITECTURE ===== */
-        .arch-section { padding: 80px 0; }
+        /* ARCHITECTURE */
+        .arch-section {
+            padding: 80px 0;
+        }
+
         .arch-flow {
             display: flex;
             align-items: center;
@@ -440,6 +589,7 @@
             border-radius: var(--radius);
             overflow-x: auto;
         }
+
         .arch-node {
             display: flex;
             flex-direction: column;
@@ -449,6 +599,7 @@
             min-width: 100px;
             text-align: center;
         }
+
         .arch-node-icon {
             width: 56px;
             height: 56px;
@@ -460,10 +611,12 @@
             border: 2px solid var(--border);
             transition: transform 0.3s, border-color 0.3s;
         }
+
         .arch-node:hover .arch-node-icon {
             transform: scale(1.1);
             border-color: var(--accent-1);
         }
+
         .arch-node-label {
             font-size: 0.72rem;
             font-weight: 600;
@@ -471,24 +624,223 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
         }
+
         .arch-arrow {
             font-size: 1.5rem;
             color: var(--text-muted);
             padding: 0 4px;
             animation: arrow-pulse 2s ease-in-out infinite;
         }
+
         @keyframes arrow-pulse {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; color: var(--accent-2); }
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 1;
+                color: var(--accent-2);
+            }
         }
 
-        /* ===== FEATURES DONE ===== */
-        .features-section { padding: 80px 0; }
+        /* DASHBOARD PREVIEW */
+        .dashboard-section {
+            padding: 80px 0;
+        }
+
+        .dashboard-preview {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-glow), 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .dashboard-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .toolbar-dot.r {
+            background: #ff5f56;
+        }
+
+        .toolbar-dot.y {
+            background: #ffbd2e;
+        }
+
+        .toolbar-dot.g {
+            background: #27c93f;
+        }
+
+        .toolbar-url {
+            flex: 1;
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .dashboard-body {
+            padding: 32px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .dash-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .dash-header h3 {
+            font-size: 1.6rem;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .dash-header p {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .dash-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dash-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 18px;
+            transition: transform 0.3s;
+        }
+
+        .dash-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .dash-card .label {
+            color: #888;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .dash-card .val {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .dash-card .val.cyan {
+            color: #00d9ff;
+        }
+
+        .dash-card .val.green {
+            color: #00ff88;
+        }
+
+        .dash-card .val.pink {
+            color: #fa709a;
+        }
+
+        .dash-card .val.yellow {
+            color: #fee140;
+        }
+
+        .dash-expenses {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dash-expenses-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .dash-expenses-header h4 {
+            font-size: 1.1rem;
+        }
+
+        .dash-btn {
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #1a1a2e;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .dash-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #00d9ff;
+            margin-bottom: 8px;
+        }
+
+        .dash-item .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .dash-item .meta {
+            color: #666;
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+
+        .dash-item .cat {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00d9ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .dash-item .amount {
+            font-weight: 700;
+            color: #ff6b6b;
+            font-size: 1rem;
+        }
+
+        /* FEATURES */
+        .features-section {
+            padding: 80px 0;
+        }
+
         .features-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 16px;
         }
+
         .feature-item {
             display: flex;
             align-items: flex-start;
@@ -499,12 +851,16 @@
             border-radius: var(--radius-sm);
             transition: border-color 0.2s;
         }
-        .feature-item:hover { border-color: rgba(0,214,143,0.4); }
+
+        .feature-item:hover {
+            border-color: rgba(0, 214, 143, 0.4);
+        }
+
         .feature-check {
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: rgba(0,214,143,0.15);
+            background: rgba(0, 214, 143, 0.15);
             color: var(--accent-green);
             display: flex;
             align-items: center;
@@ -513,15 +869,28 @@
             font-size: 0.8rem;
             font-weight: 700;
         }
-        .feature-item h4 { font-size: 0.9rem; font-weight: 600; }
-        .feature-item p { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
 
-        /* ===== ROADMAP ===== */
-        .roadmap-section { padding: 80px 0; }
+        .feature-item h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .feature-item p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ROADMAP */
+        .roadmap-section {
+            padding: 80px 0;
+        }
+
         .roadmap-timeline {
             position: relative;
             padding-left: 32px;
         }
+
         .roadmap-timeline::before {
             content: '';
             position: absolute;
@@ -529,13 +898,18 @@
             top: 0;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, var(--accent-green), var(--accent-1), var(--text-muted));
+            background: linear-gradient(to bottom, var(--accent-green), var(--accent-green), var(--accent-1), var(--text-muted));
         }
+
         .roadmap-item {
             position: relative;
             padding: 0 0 40px 24px;
         }
-        .roadmap-item:last-child { padding-bottom: 0; }
+
+        .roadmap-item:last-child {
+            padding-bottom: 0;
+        }
+
         .roadmap-dot {
             position: absolute;
             left: -26px;
@@ -545,11 +919,34 @@
             border-radius: 50%;
             border: 3px solid;
         }
-        .roadmap-dot.done { border-color: var(--accent-green); background: var(--accent-green); }
-        .roadmap-dot.current { border-color: var(--accent-1); background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); }
-        .roadmap-dot.next { border-color: var(--text-muted); background: transparent; }
-        .roadmap-item h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
-        .roadmap-item p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .roadmap-dot.done {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+        }
+
+        .roadmap-dot.current {
+            border-color: var(--accent-1);
+            background: var(--accent-1);
+            box-shadow: 0 0 10px var(--accent-1);
+        }
+
+        .roadmap-dot.next {
+            border-color: var(--text-muted);
+            background: transparent;
+        }
+
+        .roadmap-item h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .roadmap-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
         .roadmap-tag {
             display: inline-block;
             font-size: 0.68rem;
@@ -558,40 +955,68 @@
             font-weight: 600;
             margin-top: 6px;
         }
-        .roadmap-tag.done { background: rgba(0,214,143,0.15); color: var(--accent-green); }
-        .roadmap-tag.wip { background: rgba(108,92,231,0.15); color: var(--accent-2); }
-        .roadmap-tag.planned { background: rgba(85,85,106,0.2); color: var(--text-muted); }
 
-        /* ===== CODE PREVIEW ===== */
-        .code-section { padding: 80px 0; }
+        .roadmap-tag.done {
+            background: rgba(0, 214, 143, 0.15);
+            color: var(--accent-green);
+        }
+
+        .roadmap-tag.wip {
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--accent-2);
+        }
+
+        .roadmap-tag.planned {
+            background: rgba(85, 85, 106, 0.2);
+            color: var(--text-muted);
+        }
+
+        /* CODE PREVIEW */
+        .code-section {
+            padding: 80px 0;
+        }
+
         .code-block {
             background: #0d0d14;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
         }
+
         .code-header {
             display: flex;
             align-items: center;
             gap: 8px;
             padding: 12px 16px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid var(--border);
         }
+
         .code-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
         }
-        .code-dot.red { background: #ff5f56; }
-        .code-dot.yellow { background: #ffbd2e; }
-        .code-dot.green { background: #27c93f; }
+
+        .code-dot.red {
+            background: #ff5f56;
+        }
+
+        .code-dot.yellow {
+            background: #ffbd2e;
+        }
+
+        .code-dot.green {
+            background: #27c93f;
+        }
+
         .code-filename {
             font-size: 0.75rem;
             color: var(--text-muted);
             font-family: 'JetBrains Mono', monospace;
             margin-left: 8px;
         }
+
         .code-body {
             padding: 20px;
             font-family: 'JetBrains Mono', monospace;
@@ -600,417 +1025,941 @@
             color: #c0c0d8;
             overflow-x: auto;
         }
-        .code-body .keyword { color: #c792ea; }
-        .code-body .string { color: #c3e88d; }
-        .code-body .comment { color: #546e7a; }
-        .code-body .func { color: #82aaff; }
-        .code-body .number { color: #ff9f43; }
-        .code-body .emoji { font-family: 'Inter', sans-serif; }
 
-        /* ===== FOOTER ===== */
+        .code-body .keyword {
+            color: #c792ea;
+        }
+
+        .code-body .string {
+            color: #c3e88d;
+        }
+
+        .code-body .comment {
+            color: #546e7a;
+        }
+
+        .code-body .func {
+            color: #82aaff;
+        }
+
+        .code-body .emoji {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* FOOTER */
         footer {
             padding: 48px 0;
             border-top: 1px solid var(--border);
             text-align: center;
         }
+
         footer p {
             font-size: 0.82rem;
             color: var(--text-muted);
         }
-        footer a {
-            color: var(--accent-2);
-            text-decoration: none;
-        }
 
-        /* ===== RESPONSIVE ===== */
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .steps { grid-template-columns: 1fr; }
-            .tech-grid { grid-template-columns: 1fr; }
-            .features-list { grid-template-columns: 1fr; }
-            .nav-links { display: none; }
-            .arch-flow { flex-direction: column; gap: 4px; }
-            .arch-arrow { transform: rotate(90deg); }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-list {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .arch-flow {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+
+            .dash-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        /* ===== SCROLL ANIMATIONS ===== */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
+
         .reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* ===== PARTICLES CANVAS ===== */
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body>*:not(#particles):not(#mouse-glow) {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== MOUSE GLOW ===== */
+        #mouse-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        body:hover #mouse-glow {
+            opacity: 1;
+        }
+
+        /* ===== GRADIENT BORDER ANIMATION ===== */
+        .step-card,
+        .tech-card,
+        .feature-item {
+            position: relative;
+            background-clip: padding-box;
+        }
+
+        .step-card::after,
+        .tech-card::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: conic-gradient(from var(--angle, 0deg), transparent 60%, rgba(108, 92, 231, 0.5), rgba(162, 155, 254, 0.3), transparent 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .step-card:hover::after,
+        .tech-card:hover::after {
+            opacity: 1;
+            animation: rotate-border 3s linear infinite;
+        }
+
+        @keyframes rotate-border {
+            to {
+                --angle: 360deg;
+            }
+        }
+
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        /* ===== SHIMMER ON HERO TEXT ===== */
+        .hero h1 .gradient-text {
+            background: linear-gradient(90deg, #6c5ce7 0%, #a29bfe 25%, #74b9ff 50%, #a29bfe 75%, #6c5ce7 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer-text 4s linear infinite;
+        }
+
+        @keyframes shimmer-text {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* ===== PULSING GLOW ON PHONE ===== */
+        .phone-frame {
+            animation: phone-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes phone-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(108, 92, 231, 0.15), 0 20px 60px rgba(0, 0, 0, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 60px rgba(108, 92, 231, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        /* ===== FEATURE ITEM GLOW ON HOVER ===== */
+        .feature-item {
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+
+        .feature-item:hover {
+            border-color: rgba(0, 214, 143, 0.4);
+            box-shadow: 0 0 25px rgba(0, 214, 143, 0.08);
+            transform: translateY(-2px);
+        }
+
+        /* ===== STAGGERED CHILDREN ANIMATION ===== */
+        .reveal.visible .step-card,
+        .reveal.visible .tech-card,
+        .reveal.visible .feature-item,
+        .reveal.visible .stat-card {
+            animation: stagger-in 0.5s ease-out both;
+        }
+
+        .reveal.visible :nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .reveal.visible :nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .reveal.visible :nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .reveal.visible :nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .reveal.visible :nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .reveal.visible :nth-child(6) {
+            animation-delay: 0.5s;
+        }
+
+        .reveal.visible :nth-child(7) {
+            animation-delay: 0.6s;
+        }
+
+        .reveal.visible :nth-child(8) {
+            animation-delay: 0.7s;
+        }
+
+        .reveal.visible :nth-child(9) {
+            animation-delay: 0.8s;
+        }
+
+        .reveal.visible :nth-child(10) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes stagger-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== FLOATING ORBS ===== */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: 5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(116, 185, 255, 0.06) 0%, transparent 60%);
+            border-radius: 50%;
+            animation: float-orb 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-orb {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(-30px, 20px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(20px, -30px) scale(0.95);
+            }
+        }
+
+        /* ===== DASHBOARD HOVER ENHANCE ===== */
+        .dashboard-preview {
+            transition: box-shadow 0.5s, transform 0.5s;
+        }
+
+        .dashboard-preview:hover {
+            box-shadow: 0 0 80px rgba(108, 92, 231, 0.2), 0 30px 80px rgba(0, 0, 0, 0.5);
+            transform: translateY(-4px);
+        }
+
+        /* ===== HERO CTA SHIMMER ===== */
+        .hero-cta {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-cta::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+            animation: cta-shine 3s ease-in-out infinite;
+        }
+
+        @keyframes cta-shine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            40%,
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        /* ===== ARCH DATA FLOW ===== */
+        .arch-flow {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arch-flow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.3), rgba(162, 155, 254, 0.2), transparent);
+            animation: data-flow 3s linear infinite;
+        }
+
+        @keyframes data-flow {
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<!-- NAVBAR -->
-<nav>
-    <div class="container">
-        <div class="logo">💸 SpentAI</div>
-        <ul class="nav-links">
-            <li><a href="#how">How it Works</a></li>
-            <li><a href="#tech">Tech Stack</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#roadmap">Roadmap</a></li>
-        </ul>
-        <div class="nav-status">MVP in Development</div>
-    </div>
-</nav>
+    <!-- NAVBAR -->
+    <nav>
+        <div class="container">
+            <div class="logo">💸 SpentAI</div>
+            <ul class="nav-links">
+                <li><a href="#como">Como Funciona</a></li>
+                <li><a href="#tech">Tecnologias</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#roadmap">Roadmap</a></li>
+            </ul>
+            <div class="nav-status">MVP em Desenvolvimento</div>
+        </div>
+    </nav>
 
-<!-- HERO -->
-<section class="hero">
-    <div class="container">
-        <span class="badge badge-accent">🚧 Prototype — Feb 2026</span>
-        <h1>Track expenses by<br><span class="gradient-text">sending a text.</span></h1>
-        <p>No app to open. No forms to fill. Just text your expense and our AI handles the rest — categorization, currency detection, and instant tracking.</p>
-        <a href="#how" class="hero-cta">See How It Works ↓</a>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <span class="badge badge-accent">🚧 Protótipo — Fev 2026</span>
+            <h1>Registre despesas<br><span class="gradient-text">enviando uma mensagem.</span></h1>
+            <p>Sem app pra abrir. Sem formulário pra preencher. Mande um texto ou áudio com sua despesa e nossa IA faz o
+                resto — categorização, moeda e registro instantâneo.</p>
+            <a href="#como" class="hero-cta">Veja Como Funciona ↓</a>
 
-        <!-- Phone Mockup -->
-        <div class="phone-demo">
-            <div class="phone-frame">
-                <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <div class="sms-thread">
-                        <div class="sms-bubble sms-sent">Starbucks coffee $4.50</div>
-                        <div class="sms-bubble sms-received">✅ Got it! <strong>"Starbucks coffee"</strong> — $4.50 added to <strong>Food & Drink</strong></div>
-                        <div class="sms-bubble sms-sent">Uber to airport $32</div>
-                        <div class="sms-bubble sms-received">✅ Got it! <strong>"Uber to airport"</strong> — $32.00 added to <strong>Transportation</strong></div>
-                        <div class="sms-bubble sms-sent">
-                            <div class="sms-audio">
-                                🎙️
-                                <div class="audio-wave">
-                                    <span></span><span></span><span></span><span></span>
-                                    <span></span><span></span><span></span><span></span>
+            <!-- Phone Mockup -->
+            <div class="phone-demo">
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="phone-notch"></div>
+                        <div class="sms-thread">
+                            <div class="sms-bubble sms-sent">Café Starbucks $4.50</div>
+                            <div class="sms-bubble sms-received">✅ Anotado! <strong>"Café Starbucks"</strong> — $4.50
+                                adicionado em <strong>Alimentação</strong></div>
+                            <div class="sms-bubble sms-sent">Uber pro aeroporto $32</div>
+                            <div class="sms-bubble sms-received">✅ Anotado! <strong>"Uber pro aeroporto"</strong> —
+                                $32.00 em <strong>Transporte</strong></div>
+                            <div class="sms-bubble sms-sent">
+                                <div class="sms-audio">
+                                    🎙️
+                                    <div class="audio-wave">
+                                        <span></span><span></span><span></span><span></span>
+                                        <span></span><span></span><span></span><span></span>
+                                    </div>
+                                    0:04
                                 </div>
-                                0:04
                             </div>
+                            <div class="sms-bubble sms-received">✅ Transcrito: <strong>"Assinatura Netflix"</strong> —
+                                $15.99 em <strong>Lazer</strong></div>
                         </div>
-                        <div class="sms-bubble sms-received">✅ Transcribed: <strong>"Netflix subscription"</strong> — $15.99 added to <strong>Entertainment</strong></div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- STATS -->
-<section class="container">
-    <div class="stats reveal">
-        <div class="stat-card">
-            <div class="stat-number">6</div>
-            <div class="stat-label">Services Integrated</div>
+    <!-- STATS -->
+    <section class="container">
+        <div class="stats reveal">
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Serviços Integrados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">~2s</div>
+                <div class="stat-label">Tempo de Processamento</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">$2</div>
+                <div class="stat-label">Custo Mensal</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Apps pra Instalar</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">~2s</div>
-            <div class="stat-label">Processing Time</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">$2</div>
-            <div class="stat-label">Monthly Cost</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">0</div>
-            <div class="stat-label">Apps to Install</div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- HOW IT WORKS -->
-<section id="how" class="how-section">
-    <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-accent">The Flow</span>
-            <h2>How It Works</h2>
+    <!-- COMO FUNCIONA -->
+    <section id="como" class="how-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge badge-accent">O Fluxo</span>
+                <h2>Como Funciona</h2>
+            </div>
+            <div class="steps reveal">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3>Envie uma Mensagem</h3>
+                    <p>Mande um SMS ou áudio para o número dedicado. Sem instalar app. Sem login. Direto do app de
+                        mensagens nativo do celular.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3>A IA Interpreta</h3>
+                    <p>O Gemini AI extrai instantaneamente o estabelecimento, valor, moeda e categoria. Áudios são
+                        transcritos pelo Whisper antes do processamento.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3>Veja seus Gastos</h3>
+                    <p>Acompanhe suas despesas em um dashboard em tempo real com gráficos, filtros e resumo por
+                        categoria. Na web e em breve no app.</p>
+                </div>
+            </div>
         </div>
-        <div class="steps reveal">
-            <div class="step-card">
-                <div class="step-num">1</div>
-                <h3>Send a Text</h3>
-                <p>Send an SMS or audio message to our dedicated number. No app install. No login. Just your phone's native messaging.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-num">2</div>
-                <h3>AI Parses It</h3>
-                <p>Gemini AI instantly extracts the merchant, amount, currency, and category. Audio messages are first transcribed via Whisper.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-num">3</div>
-                <h3>See Your Spending</h3>
-                <p>View your expenses in a real-time dashboard with charts, filters, and category breakdowns. Available on web and soon on mobile.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- ARCHITECTURE -->
-<section id="arch" class="arch-section">
-    <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-accent">System Design</span>
-            <h2>Architecture</h2>
+    <!-- ARQUITETURA -->
+    <section id="arch" class="arch-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge badge-accent">Design do Sistema</span>
+                <h2>Arquitetura</h2>
+            </div>
+            <div class="arch-flow reveal">
+                <div class="arch-node">
+                    <div class="arch-node-icon"
+                        style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">📱</div>
+                    <div class="arch-node-label">SMS do Usuário</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-node-icon"
+                        style="background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);">📡</div>
+                    <div class="arch-node-label">Twilio</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-node-icon"
+                        style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">⚡</div>
+                    <div class="arch-node-label">API Node.js</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-node-icon"
+                        style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);">🎙️</div>
+                    <div class="arch-node-label">Whisper AI</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-node-icon"
+                        style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3);">🧠</div>
+                    <div class="arch-node-label">Gemini AI</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-node-icon"
+                        style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3);">🗄️</div>
+                    <div class="arch-node-label">Supabase</div>
+                </div>
+            </div>
         </div>
-        <div class="arch-flow reveal">
-            <div class="arch-node">
-                <div class="arch-node-icon" style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">📱</div>
-                <div class="arch-node-label">User SMS</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node">
-                <div class="arch-node-icon" style="background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);">📡</div>
-                <div class="arch-node-label">Twilio</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node">
-                <div class="arch-node-icon" style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">⚡</div>
-                <div class="arch-node-label">Node.js API</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node">
-                <div class="arch-node-icon" style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3);">🧠</div>
-                <div class="arch-node-label">Gemini AI</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node">
-                <div class="arch-node-icon" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3);">🗄️</div>
-                <div class="arch-node-label">Supabase</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node">
-                <div class="arch-node-icon" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);">📊</div>
-                <div class="arch-node-label">Dashboard</div>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- TECH STACK -->
-<section id="tech" class="tech-section">
-    <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-accent">Under the Hood</span>
-            <h2>Tech Stack</h2>
+    <!-- DASHBOARD PREVIEW -->
+    <section id="dashboard" class="dashboard-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge badge-green">✓ Funcionando</span>
+                <h2>Dashboard em Tempo Real</h2>
+            </div>
+            <div class="dashboard-preview reveal">
+                <div class="dashboard-toolbar">
+                    <div class="toolbar-dot r"></div>
+                    <div class="toolbar-dot y"></div>
+                    <div class="toolbar-dot g"></div>
+                    <div class="toolbar-url">localhost:3000 — SMS Expense Tracker</div>
+                </div>
+                <div class="dashboard-body">
+                    <div class="dash-header">
+                        <h3>💰 SMS Expense Tracker</h3>
+                        <p>Despesas extraídas automaticamente de SMS com IA</p>
+                    </div>
+                    <div class="dash-cards">
+                        <div class="dash-card">
+                            <div class="label">Total Gasto</div>
+                            <div class="val cyan">R$ 4.327,50</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="label">Alimentação</div>
+                            <div class="val green">R$ 1.280,00</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="label">Transporte</div>
+                            <div class="val pink">R$ 892,30</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="label">Compras</div>
+                            <div class="val yellow">R$ 645,20</div>
+                        </div>
+                    </div>
+                    <div class="dash-expenses">
+                        <div class="dash-expenses-header">
+                            <h4>Despesas Recentes</h4>
+                            <div class="dash-btn">🔄 Verificar SMS</div>
+                        </div>
+                        <div class="dash-item">
+                            <div>
+                                <div class="name">Café Starbucks</div>
+                                <div class="meta">2026-02-16 • +1 (251) 241-5676</div>
+                            </div>
+                            <span class="cat">alimentação</span>
+                            <span class="amount">- R$ 22,50</span>
+                        </div>
+                        <div class="dash-item">
+                            <div>
+                                <div class="name">Uber pro aeroporto</div>
+                                <div class="meta">2026-02-15 • +1 (251) 241-5676</div>
+                            </div>
+                            <span class="cat">transporte</span>
+                            <span class="amount">- R$ 89,00</span>
+                        </div>
+                        <div class="dash-item">
+                            <div>
+                                <div class="name">Assinatura Netflix</div>
+                                <div class="meta">2026-02-14 • +1 (251) 241-5676</div>
+                            </div>
+                            <span class="cat">lazer</span>
+                            <span class="amount">- R$ 55,90</span>
+                        </div>
+                        <div class="dash-item">
+                            <div>
+                                <div class="name">Mercado Pão de Açúcar</div>
+                                <div class="meta">2026-02-14 • +1 (251) 241-5676</div>
+                            </div>
+                            <span class="cat">compras</span>
+                            <span class="amount">- R$ 237,80</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="tech-grid reveal">
-            <div class="tech-card">
-                <div class="tech-icon" style="background: rgba(34,197,94,0.1);">⚡</div>
-                <div>
-                    <h4>Node.js + Express</h4>
-                    <p>Lightweight backend server handling Twilio webhooks, API routes, and real-time SMS processing.</p>
-                </div>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon" style="background: rgba(239,68,68,0.1);">📡</div>
-                <div>
-                    <h4>Twilio Programmable Messaging</h4>
-                    <p>Receives SMS/MMS via webhooks. Supports text and media (audio) messages. US number: +1 (251) 241-5676.</p>
-                </div>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon" style="background: rgba(168,85,247,0.1);">🧠</div>
-                <div>
-                    <h4>Google Gemini 2.0 Flash</h4>
-                    <p>Parses natural language into structured expense data. Extracts description, amount, currency, and category with high accuracy.</p>
-                </div>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon" style="background: rgba(59,130,246,0.1);">🗄️</div>
-                <div>
-                    <h4>Supabase (PostgreSQL)</h4>
-                    <p>Cloud-hosted PostgreSQL with real-time capabilities. Stores expenses with full indexing and future RLS support.</p>
-                </div>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon" style="background: rgba(245,158,11,0.1);">🎙️</div>
-                <div>
-                    <h4>OpenAI Whisper (Planned)</h4>
-                    <p>Audio transcription for voice messages. $0.006/min. Enables expense tracking by simply speaking.</p>
-                </div>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon" style="background: rgba(6,182,212,0.1);">📱</div>
-                <div>
-                    <h4>React Native + Expo (Planned)</h4>
-                    <p>Cross-platform mobile app for iOS and Android. Will provide dashboard, history, and smart insights.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- FEATURES DONE -->
-<section id="features" class="features-section">
-    <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-green">✓ Built</span>
-            <h2>What's Already Working</h2>
-        </div>
-        <div class="features-list reveal">
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>SMS Expense Registration</h4>
-                    <p>Send "Starbucks $4.50" and it's instantly categorized and saved.</p>
-                </div>
+    <!-- TECH STACK -->
+    <section id="tech" class="tech-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge badge-accent">Por Baixo dos Panos</span>
+                <h2>Tecnologias</h2>
             </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>AI-Powered Parsing</h4>
-                    <p>Gemini 2.0 Flash understands contextual expenses, currencies, and implied merchants.</p>
+            <div class="tech-grid reveal">
+                <div class="tech-card">
+                    <div class="tech-icon" style="background: rgba(34,197,94,0.1);">⚡</div>
+                    <div>
+                        <h4>Node.js + Express</h4>
+                        <p>Servidor backend leve que recebe webhooks do Twilio, gerencia rotas da API e processa SMS em
+                            tempo real.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>Real-Time Webhook Processing</h4>
-                    <p>Twilio delivers each SMS instantly to Node.js. No polling — zero delay.</p>
+                <div class="tech-card">
+                    <div class="tech-icon" style="background: rgba(239,68,68,0.1);">📡</div>
+                    <div>
+                        <h4>Twilio Programmable Messaging</h4>
+                        <p>Recebe SMS/MMS via webhooks. Suporta mensagens de texto e mídia (áudio). Número US dedicado.
+                        </p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>Duplicate Detection</h4>
-                    <p>Each message is tracked by Twilio MessageSid. No double-counting.</p>
+                <div class="tech-card">
+                    <div class="tech-icon" style="background: rgba(168,85,247,0.1);">🧠</div>
+                    <div>
+                        <h4>Google Gemini 2.0 Flash</h4>
+                        <p>Interpreta linguagem natural e extrai dados estruturados da despesa. Descrição, valor, moeda
+                            e categoria com alta precisão.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>Multi-Currency Detection</h4>
-                    <p>Detects USD, BRL, EUR, GBP from symbols and context (ISO 4217).</p>
+                <div class="tech-card">
+                    <div class="tech-icon" style="background: rgba(59,130,246,0.1);">🗄️</div>
+                    <div>
+                        <h4>Supabase (PostgreSQL)</h4>
+                        <p>Banco de dados cloud com capacidades real-time. Armazena despesas com indexação completa e
+                            Row Level Security.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>Auto-Categorization</h4>
-                    <p>8 categories: Food, Transport, Health, Entertainment, Shopping, Services, Transfers, Other.</p>
+                <div class="tech-card">
+                    <div class="tech-icon" style="background: rgba(245,158,11,0.1);">🎙️</div>
+                    <div>
+                        <h4>OpenAI Whisper</h4>
+                        <p>Transcrição de áudio para mensagens de voz. $0.006/min. Permite registrar despesas
+                            simplesmente falando.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>Web Dashboard</h4>
-                    <p>React + Vite dashboard with expense list, filters, and category summary.</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-check">✓</div>
-                <div>
-                    <h4>REST API</h4>
-                    <p>GET /api/expenses with filters. GET /api/summary for category totals. Ready for mobile.</p>
+                <div class="tech-card">
+                    <div class="tech-icon" style="background: rgba(6,182,212,0.1);">📱</div>
+                    <div>
+                        <h4>React + Vite (Dashboard)</h4>
+                        <p>Dashboard web com React, TypeScript e Supabase real-time. Atualização automática quando novas
+                            despesas chegam.</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- CODE PREVIEW -->
-<section class="code-section">
-    <div class="container reveal">
-        <div class="section-header">
-            <span class="badge badge-accent">&lt;/&gt; Code</span>
-            <h2>The AI Brain</h2>
-        </div>
-        <div class="code-block">
-            <div class="code-header">
-                <div class="code-dot red"></div>
-                <div class="code-dot yellow"></div>
-                <div class="code-dot green"></div>
-                <span class="code-filename">services/ai.js — parseExpense()</span>
+    <!-- FUNCIONALIDADES -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge badge-green">✓ Implementado</span>
+                <h2>O Que Já Funciona</h2>
             </div>
-            <div class="code-body">
-<span class="comment">// User texts: "Starbucks coffee $4.50"</span><br>
-<span class="keyword">const</span> prompt = <span class="string">`Analyze this SMS and extract expense info:</span><br>
-<span class="string">&nbsp;&nbsp;- description, amount, currency (ISO 4217)</span><br>
-<span class="string">&nbsp;&nbsp;- category: [food, transport, health, ...]`</span>;<br>
-<br>
-<span class="keyword">const</span> result = <span class="keyword">await</span> model.<span class="func">generateContent</span>(prompt);<br>
-<br>
-<span class="comment">// AI returns structured JSON:</span><br>
-<span class="comment">// { description: "Starbucks coffee",</span><br>
-<span class="comment">//   amount: 4.50, currency: "USD",</span><br>
-<span class="comment">//   category: "food" }</span><br>
-<br>
-<span class="keyword">await</span> <span class="func">saveExpense</span>(parsed); <span class="comment">// → Supabase</span><br>
-<span class="emoji">✅</span> <span class="comment">// Reply SMS: "Got it! Starbucks coffee — $4.50"</span>
+            <div class="features-list reveal">
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Registro de Despesas por SMS</h4>
+                        <p>Envie "Starbucks $4.50" e a despesa é categorizada e salva instantaneamente.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Registro de Despesas por Áudio</h4>
+                        <p>Envie um áudio descrevendo a despesa. O Whisper transcreve e o Gemini interpreta
+                            automaticamente.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Parsing com IA (Gemini 2.0 Flash)</h4>
+                        <p>Entende despesas contextuais, moedas e estabelecimentos implícitos com alta precisão.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Webhook em Tempo Real</h4>
+                        <p>Twilio entrega cada SMS instantaneamente ao Node.js. Sem polling — zero delay.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Detecção de Duplicatas</h4>
+                        <p>Cada mensagem é rastreada pelo Twilio MessageSid. Sem contagem dupla.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Detecção Multi-Moeda</h4>
+                        <p>Detecta USD, BRL, EUR, GBP por símbolos e contexto (ISO 4217).</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Autenticação Multi-Usuário</h4>
+                        <p>Cada usuário identificado por telefone com Row Level Security no Supabase.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Categorização Automática</h4>
+                        <p>8 categorias: Alimentação, Transporte, Saúde, Lazer, Compras, Serviços, Transferências,
+                            Outros.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>Dashboard Web em Tempo Real</h4>
+                        <p>React + Vite com lista de despesas, filtros, resumo por categoria e atualização automática.
+                        </p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-check">✓</div>
+                    <div>
+                        <h4>API REST</h4>
+                        <p>GET /api/expenses com filtros. GET /api/summary para totais por categoria. Pronta para
+                            mobile.</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ROADMAP -->
-<section id="roadmap" class="roadmap-section">
-    <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-accent">🗺️ Plan</span>
-            <h2>Roadmap</h2>
-        </div>
-        <div class="roadmap-timeline reveal">
-            <div class="roadmap-item">
-                <div class="roadmap-dot done"></div>
-                <h4>SMS Expense Tracking via Twilio</h4>
-                <p>Receive SMS, parse with Gemini AI, save to Supabase, web dashboard.</p>
-                <span class="roadmap-tag done">✓ COMPLETE</span>
+    <!-- CODE PREVIEW -->
+    <section class="code-section">
+        <div class="container reveal">
+            <div class="section-header">
+                <span class="badge badge-accent">&lt;/&gt; Código</span>
+                <h2>O Cérebro da IA</h2>
             </div>
-            <div class="roadmap-item">
-                <div class="roadmap-dot current"></div>
-                <h4>Audio Message Support (Whisper)</h4>
-                <p>Transcribe voice messages using OpenAI Whisper API and process as text.</p>
-                <span class="roadmap-tag wip">IN PROGRESS</span>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-dot current"></div>
-                <h4>Smart SMS Replies</h4>
-                <p>Confirmation messages, spending summaries, and undo commands via SMS.</p>
-                <span class="roadmap-tag wip">IN PROGRESS</span>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-dot next"></div>
-                <h4>Multi-User Authentication</h4>
-                <p>User accounts with phone-based identification. Row Level Security on Supabase.</p>
-                <span class="roadmap-tag planned">PLANNED</span>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-dot next"></div>
-                <h4>React Native Mobile App</h4>
-                <p>Native iOS/Android app with login, dashboard, expense history, and charts.</p>
-                <span class="roadmap-tag planned">PLANNED</span>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-dot next"></div>
-                <h4>Production Deploy</h4>
-                <p>Deploy to Railway/Render with custom domain, SSL, and monitoring.</p>
-                <span class="roadmap-tag planned">PLANNED</span>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dot red"></div>
+                    <div class="code-dot yellow"></div>
+                    <div class="code-dot green"></div>
+                    <span class="code-filename">services/ai.js — parseExpense()</span>
+                </div>
+                <div class="code-body">
+                    <span class="comment">// Usuário envia: "Café Starbucks $4.50"</span><br>
+                    <span class="keyword">const</span> prompt = <span class="string">`Analise este SMS e extraia info da
+                        despesa:</span><br>
+                    <span class="string">&nbsp;&nbsp;- descrição, valor, moeda (ISO 4217)</span><br>
+                    <span class="string">&nbsp;&nbsp;- categoria: [alimentação, transporte, saúde, ...]`</span>;<br>
+                    <br>
+                    <span class="keyword">const</span> result = <span class="keyword">await</span> model.<span
+                        class="func">generateContent</span>(prompt);<br>
+                    <br>
+                    <span class="comment">// IA retorna JSON estruturado:</span><br>
+                    <span class="comment">// { description: "Café Starbucks",</span><br>
+                    <span class="comment">// amount: 4.50, currency: "USD",</span><br>
+                    <span class="comment">// category: "alimentação" }</span><br>
+                    <br>
+                    <span class="keyword">await</span> <span class="func">saveExpense</span>(parsed); <span
+                        class="comment">// → Supabase</span><br>
+                    <span class="emoji">✅</span> <span class="comment">// Despesa registrada com sucesso!</span>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- FOOTER -->
-<footer>
-    <div class="container">
-        <p style="margin-bottom: 8px;"><strong style="background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">💸 SpentAI</strong></p>
-        <p>Built with Node.js, Twilio, Gemini AI, and Supabase</p>
-        <p style="margin-top: 16px; font-size: 0.72rem;">MVP Prototype — February 2026 &nbsp;·&nbsp; Targeting US Market</p>
-    </div>
-</footer>
+    <!-- ROADMAP -->
+    <section id="roadmap" class="roadmap-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="badge badge-accent">🗺️ Plano</span>
+                <h2>Roadmap</h2>
+            </div>
+            <div class="roadmap-timeline reveal">
+                <div class="roadmap-item">
+                    <div class="roadmap-dot done"></div>
+                    <h4>Registro de Despesas via SMS (Twilio)</h4>
+                    <p>Receber SMS, interpretar com Gemini AI, salvar no Supabase, dashboard web.</p>
+                    <span class="roadmap-tag done">✓ CONCLUÍDO</span>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-dot done"></div>
+                    <h4>Suporte a Mensagens de Áudio (Whisper)</h4>
+                    <p>Transcrição de mensagens de voz usando OpenAI Whisper API e processamento como texto.</p>
+                    <span class="roadmap-tag done">✓ CONCLUÍDO</span>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-dot done"></div>
+                    <h4>Autenticação Multi-Usuário</h4>
+                    <p>Contas de usuário com identificação por telefone. Row Level Security no Supabase.</p>
+                    <span class="roadmap-tag done">✓ CONCLUÍDO</span>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-dot current"></div>
+                    <h4>Aplicativo Mobile (React Native)</h4>
+                    <p>App nativo iOS/Android com login, dashboard, histórico de despesas e gráficos.</p>
+                    <span class="roadmap-tag wip">EM PROGRESSO</span>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-dot next"></div>
+                    <h4>Deploy em Produção</h4>
+                    <p>Deploy em Railway/Render com domínio customizado, SSL e monitoramento.</p>
+                    <span class="roadmap-tag planned">PLANEJADO</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- SCROLL REVEAL -->
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 8px;"><strong
+                    style="background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">💸
+                    SpentAI</strong></p>
+            <p>Desenvolvido com Node.js, Twilio, Gemini AI e Supabase</p>
+            <p style="margin-top: 16px; font-size: 0.72rem;">Protótipo MVP — Fevereiro 2026 &nbsp;·&nbsp; Mercado
+                Norte-Americano 🇺🇸</p>
+        </div>
+    </footer>
+
+    <!-- PARTICLES CANVAS -->
+    <canvas id="particles"></canvas>
+    <!-- MOUSE GLOW -->
+    <div id="mouse-glow"></div>
+
+    <script>
+        // ===== SCROLL REVEAL =====
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ===== MOUSE GLOW =====
+        const glow = document.getElementById('mouse-glow');
+        let mx = 0, my = 0, gx = 0, gy = 0;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+        (function animGlow() {
+            gx += (mx - gx) * 0.08;
+            gy += (my - gy) * 0.08;
+            glow.style.left = gx + 'px';
+            glow.style.top = gy + 'px';
+            requestAnimationFrame(animGlow);
+        })();
+
+        // ===== PARTICLES =====
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+        function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const particles = Array.from({ length: 60 }, () => ({
+            x: Math.random() * innerWidth,
+            y: Math.random() * innerHeight,
+            r: Math.random() * 2 + 0.5,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            alpha: Math.random() * 0.4 + 0.1
+        }));
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, W, H);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+                if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(162, 155, 254, ${p.alpha})`;
+                ctx.fill();
+            });
+            // Draw connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(108, 92, 231, ${0.08 * (1 - dist / 150)})`;
+                        ctx.stroke();
+                    }
+                }
             }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
+        // ===== COUNTER ANIMATION =====
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.querySelectorAll('.stat-number').forEach(el => {
+                    if (el.dataset.animated) return;
+                    el.dataset.animated = '1';
+                    const final = el.textContent;
+                    const num = parseFloat(final.replace(/[^0-9.]/g, ''));
+                    const prefix = final.match(/^[^0-9]*/)[0];
+                    const suffix = final.match(/[^0-9.]*$/)[0];
+                    if (isNaN(num)) return;
+                    const duration = 1500;
+                    const start = performance.now();
+                    function tick(now) {
+                        const t = Math.min((now - start) / duration, 1);
+                        const ease = 1 - Math.pow(1 - t, 3);
+                        const cur = Math.round(num * ease);
+                        el.textContent = prefix + (num % 1 === 0 ? cur : cur) + suffix;
+                        if (t < 1) requestAnimationFrame(tick);
+                        else el.textContent = final;
+                    }
+                    requestAnimationFrame(tick);
+                });
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('.stats').forEach(el => statObserver.observe(el));
+
+        // ===== TILT EFFECT ON CARDS =====
+        document.querySelectorAll('.step-card, .dash-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                card.style.transform = `perspective(600px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+    </script>
 </body>
+
 </html>
