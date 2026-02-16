@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpentAI — Relatório Técnico</title>
+    <meta name="description"
+        content="Relatório técnico detalhado do SpentAI: arquitetura, custos, segurança e infraestrutura.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --bg2: #111118;
+            --card: #16161f;
+            --border: #2a2a3a;
+            --text: #f0f0f5;
+            --text2: #8888a0;
+            --muted: #55556a;
+            --accent: #6c5ce7;
+            --accent2: #a29bfe;
+            --green: #00d68f;
+            --grad: linear-gradient(135deg, #6c5ce7, #a29bfe, #74b9ff);
+            --radius: 16px;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden
+        }
+
+        /* PARTICLE CANVAS */
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none
+        }
+
+        body>*:not(#particles):not(#glow) {
+            position: relative;
+            z-index: 1
+        }
+
+        #glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity .3s
+        }
+
+        body:hover #glow {
+            opacity: 1
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 14px 0;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(42, 42, 58, 0.5)
+        }
+
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none
+        }
+
+        .nav-links a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: .82rem;
+            font-weight: 500;
+            transition: color .2s
+        }
+
+        .nav-links a:hover {
+            color: var(--text)
+        }
+
+        .back-link {
+            color: var(--accent2);
+            text-decoration: none;
+            font-size: .82rem;
+            font-weight: 600;
+            transition: opacity .2s
+        }
+
+        .back-link:hover {
+            opacity: .8
+        }
+
+        /* HERO */
+        .report-hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            position: relative
+        }
+
+        .report-hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.1) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--accent2);
+            border: 1px solid rgba(108, 92, 231, 0.3)
+        }
+
+        .report-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            letter-spacing: -.03em;
+            margin: 16px 0 12px
+        }
+
+        .report-hero h1 span {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shimmer 4s linear infinite
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position: 200% center
+            }
+        }
+
+        .report-hero p {
+            color: var(--text2);
+            max-width: 520px;
+            margin: 0 auto;
+            font-size: 1rem
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            font-size: .78rem;
+            color: var(--muted)
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin: 40px 0 60px
+        }
+
+        .toc h3 {
+            font-size: 1rem;
+            margin-bottom: 14px;
+            color: var(--accent2)
+        }
+
+        .toc ol {
+            padding-left: 20px
+        }
+
+        .toc li {
+            margin-bottom: 6px
+        }
+
+        .toc a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: .88rem;
+            transition: color .2s
+        }
+
+        .toc a:hover {
+            color: var(--accent2)
+        }
+
+        /* SECTIONS */
+        .section {
+            padding: 48px 0;
+            border-top: 1px solid rgba(42, 42, 58, 0.4)
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .section h2 .num {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem
+        }
+
+        .section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 20px 0 10px;
+            color: var(--accent2)
+        }
+
+        .section p,
+        .section li {
+            color: var(--text2);
+            font-size: .9rem;
+            line-height: 1.75
+        }
+
+        .section ul,
+        .section ol {
+            padding-left: 20px;
+            margin: 8px 0
+        }
+
+        .section li {
+            margin-bottom: 6px
+        }
+
+        /* CARDS GRID */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 20px 0
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color .3s, transform .3s, box-shadow .3s
+        }
+
+        .card:hover {
+            border-color: rgba(108, 92, 231, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(108, 92, 231, 0.08)
+        }
+
+        .card .icon {
+            font-size: 1.4rem;
+            margin-bottom: 8px
+        }
+
+        .card h4 {
+            font-size: .92rem;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .card p {
+            font-size: .8rem;
+            color: var(--text2);
+            line-height: 1.55
+        }
+
+        /* CODE BLOCKS */
+        .code-block {
+            background: #0d0d14;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 16px 0
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%
+        }
+
+        .dot.r {
+            background: #ff5f56
+        }
+
+        .dot.y {
+            background: #ffbd2e
+        }
+
+        .dot.g {
+            background: #27c93f
+        }
+
+        .code-title {
+            font-size: .72rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 8px
+        }
+
+        pre {
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            line-height: 1.8;
+            color: #c0c0d8;
+            overflow-x: auto;
+            margin: 0
+        }
+
+        .kw {
+            color: #c792ea
+        }
+
+        .str {
+            color: #c3e88d
+        }
+
+        .fn {
+            color: #82aaff
+        }
+
+        .cm {
+            color: #546e7a
+        }
+
+        .num {
+            color: #f78c6c
+        }
+
+        /* COST TABLE */
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: .85rem
+        }
+
+        .cost-table th,
+        .cost-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .cost-table th {
+            background: rgba(108, 92, 231, 0.08);
+            color: var(--accent2);
+            font-weight: 600;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .04em
+        }
+
+        .cost-table td {
+            color: var(--text2)
+        }
+
+        .cost-table tr:hover td {
+            background: rgba(108, 92, 231, 0.03)
+        }
+
+        .cost-table .total-row {
+            border-top: 2px solid var(--accent)
+        }
+
+        .cost-table .total-row td {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 1rem
+        }
+
+        .cost-highlight {
+            display: inline-block;
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--accent2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        /* ARCHITECTURE FLOW */
+        .arch {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+            padding: 32px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden
+        }
+
+        .arch::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.3), rgba(162, 155, 254, 0.2), transparent);
+            animation: flow 3s linear infinite
+        }
+
+        @keyframes flow {
+            from {
+                transform: translateX(-100%)
+            }
+
+            to {
+                transform: translateX(100%)
+            }
+        }
+
+        .arch-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 12px;
+            min-width: 80px;
+            text-align: center
+        }
+
+        .arch-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            border: 2px solid var(--border);
+            transition: transform .3s, border-color .3s
+        }
+
+        .arch-node:hover .arch-icon {
+            transform: scale(1.12);
+            border-color: var(--accent)
+        }
+
+        .arch-label {
+            font-size: .65rem;
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
+
+        .arch-arrow {
+            font-size: 1.3rem;
+            color: var(--muted);
+            padding: 0 2px;
+            animation: pulse-arrow 2s ease-in-out infinite
+        }
+
+        @keyframes pulse-arrow {
+
+            0%,
+            100% {
+                opacity: .4
+            }
+
+            50% {
+                opacity: 1;
+                color: var(--accent2)
+            }
+        }
+
+        /* DB SCHEMA */
+        .schema {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0
+        }
+
+        .schema h4 {
+            font-size: .9rem;
+            color: var(--accent2);
+            margin-bottom: 10px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .schema-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(42, 42, 58, 0.3);
+            font-size: .8rem
+        }
+
+        .schema-field:last-child {
+            border: none
+        }
+
+        .schema-field .name {
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .schema-field .type {
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem
+        }
+
+        /* SECURITY BADGE */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0
+        }
+
+        .sec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 14px;
+            background: rgba(0, 214, 143, 0.04);
+            border: 1px solid rgba(0, 214, 143, 0.15);
+            border-radius: 10px
+        }
+
+        .sec-item .check {
+            color: var(--green);
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        .sec-item p {
+            font-size: .82rem;
+            color: var(--text2)
+        }
+
+        .sec-item strong {
+            color: var(--text)
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center
+        }
+
+        footer p {
+            font-size: .78rem;
+            color: var(--muted)
+        }
+
+        footer strong {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        /* REVEAL */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity .5s, transform .5s
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        @media(max-width:768px) {
+            .cards {
+                grid-template-columns: 1fr
+            }
+
+            .arch {
+                flex-direction: column
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg)
+            }
+
+            .nav-links {
+                display: none
+            }
+
+            .meta-info {
+                flex-direction: column;
+                gap: 6px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="particles"></canvas>
+    <div id="glow"></div>
+
+    <nav>
+        <div class="container">
+            <div class="logo">💸 SpentAI</div>
+            <ul class="nav-links">
+                <li><a href="#arquitetura">Arquitetura</a></li>
+                <li><a href="#custos">Custos</a></li>
+                <li><a href="#seguranca">Segurança</a></li>
+                <li><a href="#banco">Banco de Dados</a></li>
+            </ul>
+            <a href="index.html" class="back-link">← Showcase</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="report-hero">
+        <div class="container">
+            <span class="badge">📋 Documentação Técnica</span>
+            <h1>Relatório Técnico <span>SpentAI</span></h1>
+            <p>Documentação completa da arquitetura, infraestrutura, custos operacionais e decisões técnicas do sistema.
+            </p>
+            <div class="meta-info">
+                <span>📅 Fevereiro 2026</span>
+                <span>🏢 Finess Tech</span>
+                <span>🔖 v1.0 MVP</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- TOC -->
+        <div class="toc reveal">
+            <h3>📑 Índice</h3>
+            <ol>
+                <li><a href="#visao">Visão Geral do Sistema</a></li>
+                <li><a href="#arquitetura">Arquitetura e Fluxo de Dados</a></li>
+                <li><a href="#stack">Stack Tecnológico</a></li>
+                <li><a href="#ia">Motor de IA — Gemini 2.0 Flash</a></li>
+                <li><a href="#banco">Banco de Dados e Schema</a></li>
+                <li><a href="#seguranca">Segurança e Autenticação</a></li>
+                <li><a href="#api">Endpoints da API</a></li>
+                <li><a href="#custos">Análise Detalhada de Custos</a></li>
+                <li><a href="#escalabilidade">Escalabilidade</a></li>
+            </ol>
+        </div>
+
+        <!-- 1. VISÃO GERAL -->
+        <section id="visao" class="section reveal">
+            <h2><span class="num">01</span> Visão Geral do Sistema</h2>
+            <p>O <strong>SpentAI</strong> é uma aplicação financeira que permite aos usuários registrar despesas
+                enviando mensagens de texto (SMS) ou áudio para um número de telefone dedicado. O sistema utiliza IA
+                para interpretar a mensagem, extrair dados estruturados (valor, descrição, moeda, categoria) e armazenar
+                automaticamente no banco de dados.</p>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="icon">📱</div>
+                    <h4>Entrada via SMS/Áudio</h4>
+                    <p>Twilio recebe SMS e MMS (áudio). Zero fricção — funciona do app de mensagens nativo.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🧠</div>
+                    <h4>IA Unificada (Gemini)</h4>
+                    <p>Gemini 2.0 Flash faz tanto a transcrição de áudio quanto o parsing de despesas. Uma única API.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="icon">🗄️</div>
+                    <h4>Supabase Cloud</h4>
+                    <p>PostgreSQL gerenciado com Row Level Security, autenticação e APIs real-time.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">📊</div>
+                    <h4>Dashboard React</h4>
+                    <p>Interface web em tempo real com gráficos, filtros e atualização automática via Supabase Realtime.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ARQUITETURA -->
+        <section id="arquitetura" class="section reveal">
+            <h2><span class="num">02</span> Arquitetura e Fluxo de Dados</h2>
+            <p>O sistema segue uma arquitetura <strong>event-driven</strong> onde o Twilio dispara webhooks para cada
+                mensagem recebida. O servidor Node.js processa em tempo real e persiste no Supabase.</p>
+
+            <div class="arch">
+                <div class="arch-node">
+                    <div class="arch-icon" style="background:rgba(37,99,235,0.1);border-color:rgba(37,99,235,0.3)">📱
+                    </div>
+                    <div class="arch-label">Usuário</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-icon" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3)">📡
+                    </div>
+                    <div class="arch-label">Twilio</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-icon" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3)">⚡
+                    </div>
+                    <div class="arch-label">Node.js</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-icon" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3)">🧠
+                    </div>
+                    <div class="arch-label">Gemini AI</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-icon" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3)">🗄️
+                    </div>
+                    <div class="arch-label">Supabase</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="arch-icon" style="background:rgba(6,182,212,0.1);border-color:rgba(6,182,212,0.3)">📊
+                    </div>
+                    <div class="arch-label">Dashboard</div>
+                </div>
+            </div>
+
+            <h3>Fluxo de Processamento (SMS de Texto)</h3>
+            <ol>
+                <li>Usuário envia SMS para o número Twilio <code>+1 (251) 241-XXXX</code></li>
+                <li>Twilio dispara webhook <code>POST /sms</code> com <code>Body</code>, <code>From</code>,
+                    <code>MessageSid</code></li>
+                <li>Servidor verifica duplicata via <code>MessageSid</code> na tabela <code>processed_messages</code>
+                </li>
+                <li>Gemini 2.0 Flash analisa o texto e retorna JSON estruturado</li>
+                <li>Dados salvos na tabela <code>expenses</code> com RLS por <code>sms_phone</code></li>
+                <li>Dashboard atualiza em tempo real via Supabase Realtime</li>
+            </ol>
+
+            <h3>Fluxo de Processamento (Mensagem de Áudio)</h3>
+            <ol>
+                <li>Usuário envia áudio via MMS para o número Twilio</li>
+                <li>Twilio entrega URL do áudio no webhook (<code>MediaUrl0</code>)</li>
+                <li>Servidor baixa o arquivo de áudio e envia para <strong>Gemini 2.0 Flash</strong> (multimodal)</li>
+                <li>Gemini transcreve o áudio E extrai os dados da despesa em uma única chamada</li>
+                <li>Resultado JSON salvo no Supabase (mesmo fluxo do texto)</li>
+            </ol>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <span class="code-title">Fluxo Gemini Multimodal (áudio → despesa)</span>
+                </div>
+                <pre><span class="cm">// Gemini processa áudio diretamente — sem Whisper</span>
+<span class="kw">const</span> audioBuffer = <span class="kw">await</span> <span class="fn">downloadAudio</span>(mediaUrl);
+<span class="kw">const</span> result = <span class="kw">await</span> model.<span class="fn">generateContent</span>([
+  <span class="str">"Transcreva este áudio e extraia a despesa..."</span>,
+  { inlineData: { data: audioBuffer, mimeType: <span class="str">"audio/ogg"</span> }}
+]);
+<span class="cm">// Retorna: { description, amount, currency, category }</span></pre>
+            </div>
+        </section>
+
+        <!-- 3. STACK -->
+        <section id="stack" class="section reveal">
+            <h2><span class="num">03</span> Stack Tecnológico</h2>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="icon">⚡</div>
+                    <h4>Node.js + Express</h4>
+                    <p>Runtime: Node.js 20 LTS. Framework HTTP minimalista para webhooks e API REST. ~112 linhas de
+                        código no servidor principal.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">📡</div>
+                    <h4>Twilio Programmable Messaging</h4>
+                    <p>Recebe SMS/MMS via webhooks. Número dedicado US +1. SDK: <code>twilio@5.x</code>. Suporta texto +
+                        mídia (áudio, imagens).</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🧠</div>
+                    <h4>Google Gemini 2.0 Flash</h4>
+                    <p>Modelo multimodal: parsing de texto E transcrição de áudio. SDK:
+                        <code>@google/generative-ai@0.21</code>. Substitui Whisper com custo menor.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🗄️</div>
+                    <h4>Supabase (PostgreSQL)</h4>
+                    <p>BaaS com Postgres, Auth, RLS, Realtime e Storage. Região: <code>sa-east-1</code>. SDK:
+                        <code>@supabase/supabase-js@2.90</code>.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">⚛️</div>
+                    <h4>React + Vite + TypeScript</h4>
+                    <p>Dashboard SPA com hot reload. Build tool: Vite 5. Estilização: CSS Modules + Glassmorphism.
+                        Supabase Realtime para live updates.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🚇</div>
+                    <h4>LocalTunnel / Railway</h4>
+                    <p>Dev: LocalTunnel para expor localhost. Prod: Railway/Render com auto-deploy via GitHub, SSL
+                        automático.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. MOTOR DE IA -->
+        <section id="ia" class="section reveal">
+            <h2><span class="num">04</span> Motor de IA — Gemini 2.0 Flash</h2>
+            <p>O SpentAI utiliza <strong>exclusivamente o Gemini 2.0 Flash</strong> da Google para todas as tarefas de
+                IA, eliminando a necessidade do OpenAI Whisper. Isso simplifica a arquitetura (uma única API) e reduz
+                custos.</p>
+
+            <h3>Capacidades Utilizadas</h3>
+            <div class="cards">
+                <div class="card">
+                    <div class="icon">📝</div>
+                    <h4>Parsing de Texto</h4>
+                    <p>Extrai descrição, valor, moeda (ISO 4217) e categoria de mensagens em linguagem natural. Ex:
+                        "Uber 32" → {description: "Uber", amount: 32, category: "transporte"}.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🎙️</div>
+                    <h4>Transcrição + Parsing de Áudio</h4>
+                    <p>Capacidade multimodal: recebe áudio e retorna JSON estruturado em uma só chamada. Elimina
+                        pipeline Whisper → parser separado.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">💱</div>
+                    <h4>Detecção de Moeda</h4>
+                    <p>Identifica USD, BRL, EUR, GBP por símbolos ($, R$, €, £) e contexto. Default: BRL.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🏷️</div>
+                    <h4>Categorização Automática</h4>
+                    <p>8 categorias: alimentação, transporte, saúde, lazer, compras, serviços, transferências, outros.
+                    </p>
+                </div>
+            </div>
+
+            <h3>Prompt Engineering</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <span class="code-title">services/ai.js — parseExpense()</span>
+                </div>
+                <pre><span class="kw">const</span> prompt = <span class="str">`Analyze this SMS message and extract expense info.
+Be smart about "contextual" expenses where purpose is implied
+(e.g., "Ian 3000" = "Transfer to Ian R$3000").
+
+Return JSON:
+- description: short desc
+- amount: numeric value
+- currency: ISO 4217 (default BRL)
+- category: [alimentação, transporte, saúde, lazer,
+             compras, serviços, transferências, outros]
+- date: YYYY-MM-DD or null
+
+If NOT an expense: {"isExpense": false}
+SMS: "${smsText}"
+Return ONLY valid JSON.`</span>;
+
+<span class="kw">const</span> result = <span class="kw">await</span> model.<span class="fn">generateContent</span>(prompt);
+<span class="kw">const</span> parsed = <span class="fn">JSON.parse</span>(result.response.<span class="fn">text</span>());</pre>
+            </div>
+
+            <h3>Gemini vs Whisper — Por que Gemini?</h3>
+            <table class="cost-table">
+                <tr>
+                    <th>Critério</th>
+                    <th>OpenAI Whisper</th>
+                    <th>Gemini 2.0 Flash ✓</th>
+                </tr>
+                <tr>
+                    <td>Transcrição de áudio</td>
+                    <td>✅ Dedicado</td>
+                    <td>✅ Multimodal nativo</td>
+                </tr>
+                <tr>
+                    <td>Parsing de despesas</td>
+                    <td>❌ Requer 2ª API</td>
+                    <td>✅ Na mesma chamada</td>
+                </tr>
+                <tr>
+                    <td>Chamadas de API</td>
+                    <td>2 (Whisper + GPT)</td>
+                    <td>1 (Gemini)</td>
+                </tr>
+                <tr>
+                    <td>Custo por áudio (1 min)</td>
+                    <td>$0.006 + $0.002</td>
+                    <td>~$0.001</td>
+                </tr>
+                <tr>
+                    <td>Latência</td>
+                    <td>~2-3s (2 chamadas)</td>
+                    <td>~1-2s (1 chamada)</td>
+                </tr>
+                <tr>
+                    <td>SDKs necessários</td>
+                    <td>2 (openai + separado)</td>
+                    <td>1 (@google/generative-ai)</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 5. BANCO DE DADOS -->
+        <section id="banco" class="section reveal">
+            <h2><span class="num">05</span> Banco de Dados e Schema</h2>
+            <p>O Supabase fornece PostgreSQL gerenciado com Auth integrado, Row Level Security e Realtime subscriptions.
+                Região: <code>sa-east-1</code> (São Paulo).</p>
+
+            <div class="schema">
+                <h4>📋 expenses</h4>
+                <div class="schema-field"><span class="name">id</span><span class="type">UUID DEFAULT gen_random_uuid()
+                        PK</span></div>
+                <div class="schema-field"><span class="name">description</span><span class="type">TEXT NOT NULL</span>
+                </div>
+                <div class="schema-field"><span class="name">amount</span><span class="type">DECIMAL(10,2) NOT
+                        NULL</span></div>
+                <div class="schema-field"><span class="name">category</span><span class="type">TEXT DEFAULT
+                        'outros'</span></div>
+                <div class="schema-field"><span class="name">expense_date</span><span class="type">DATE DEFAULT
+                        CURRENT_DATE</span></div>
+                <div class="schema-field"><span class="name">sms_phone</span><span class="type">TEXT</span></div>
+                <div class="schema-field"><span class="name">sms_id</span><span class="type">TEXT UNIQUE</span></div>
+                <div class="schema-field"><span class="name">raw_message</span><span class="type">TEXT</span></div>
+                <div class="schema-field"><span class="name">created_at</span><span class="type">TIMESTAMPTZ DEFAULT
+                        NOW()</span></div>
+            </div>
+
+            <div class="schema">
+                <h4>📋 processed_messages</h4>
+                <div class="schema-field"><span class="name">id</span><span class="type">UUID DEFAULT gen_random_uuid()
+                        PK</span></div>
+                <div class="schema-field"><span class="name">sms_id</span><span class="type">TEXT UNIQUE NOT NULL</span>
+                </div>
+                <div class="schema-field"><span class="name">status</span><span class="type">TEXT NOT NULL
+                        (expense|ignored|error)</span></div>
+                <div class="schema-field"><span class="name">processed_at</span><span class="type">TIMESTAMPTZ DEFAULT
+                        NOW()</span></div>
+            </div>
+
+            <h3>Índices</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <span class="code-title">supabase-setup.sql</span>
+                </div>
+                <pre><span class="kw">CREATE INDEX</span> idx_expenses_date <span class="kw">ON</span> expenses(expense_date);
+<span class="kw">CREATE INDEX</span> idx_expenses_category <span class="kw">ON</span> expenses(category);
+<span class="kw">CREATE INDEX</span> idx_expenses_phone <span class="kw">ON</span> expenses(sms_phone);
+<span class="kw">CREATE UNIQUE INDEX</span> idx_processed_sms <span class="kw">ON</span> processed_messages(sms_id);</pre>
+            </div>
+        </section>
+
+        <!-- 6. SEGURANÇA -->
+        <section id="seguranca" class="section reveal">
+            <h2><span class="num">06</span> Segurança e Autenticação</h2>
+
+            <h3>Supabase Auth</h3>
+            <p>O sistema utiliza <strong>Supabase Auth</strong> para gerenciar identidade dos usuários. No MVP, a
+                autenticação é baseada no número de telefone do SMS (identificação automática via Twilio). Para o
+                dashboard web e futuro app mobile, Supabase Auth fornece:</p>
+            <ul>
+                <li><strong>Phone Auth (OTP)</strong> — Login via código SMS enviado ao telefone do usuário</li>
+                <li><strong>Magic Link</strong> — Login via email com link de acesso único</li>
+                <li><strong>JWT Tokens</strong> — Gerados pelo Supabase, validados no backend e client</li>
+                <li><strong>Session Management</strong> — Refresh tokens automáticos com expiração configurável</li>
+            </ul>
+
+            <h3>Row Level Security (RLS)</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <span class="code-title">Políticas RLS no Supabase</span>
+                </div>
+                <pre><span class="cm">-- Habilitar RLS</span>
+<span class="kw">ALTER TABLE</span> expenses <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="cm">-- Cada usuário só vê suas próprias despesas</span>
+<span class="kw">CREATE POLICY</span> <span class="str">"Users view own expenses"</span>
+  <span class="kw">ON</span> expenses <span class="kw">FOR SELECT</span>
+  <span class="kw">USING</span> (sms_phone = auth.jwt()-><span class="str">'phone'</span>);
+
+<span class="cm">-- Serviço backend insere para qualquer usuário</span>
+<span class="kw">CREATE POLICY</span> <span class="str">"Service inserts expenses"</span>
+  <span class="kw">ON</span> expenses <span class="kw">FOR INSERT</span>
+  <span class="kw">WITH CHECK</span> (auth.role() = <span class="str">'service_role'</span>);</pre>
+            </div>
+
+            <h3>Camadas de Segurança</h3>
+            <div class="security-grid">
+                <div class="sec-item">
+                    <span class="check">✓</span>
+                    <div><strong>RLS no PostgreSQL</strong>
+                        <p>Isolamento de dados por telefone do usuário a nível de banco</p>
+                    </div>
+                </div>
+                <div class="sec-item">
+                    <span class="check">✓</span>
+                    <div><strong>Twilio Webhook Validation</strong>
+                        <p>Verificação de assinatura X-Twilio-Signature em cada webhook</p>
+                    </div>
+                </div>
+                <div class="sec-item">
+                    <span class="check">✓</span>
+                    <div><strong>Variáveis de Ambiente</strong>
+                        <p>Credenciais em .env, nunca commitadas (via .gitignore)</p>
+                    </div>
+                </div>
+                <div class="sec-item">
+                    <span class="check">✓</span>
+                    <div><strong>Deduplicação por MessageSid</strong>
+                        <p>Previne processamento duplicado de uma mesma mensagem</p>
+                    </div>
+                </div>
+                <div class="sec-item">
+                    <span class="check">✓</span>
+                    <div><strong>Supabase Auth JWT</strong>
+                        <p>Tokens assinados com rotação automática para dashboard e API</p>
+                    </div>
+                </div>
+                <div class="sec-item">
+                    <span class="check">✓</span>
+                    <div><strong>HTTPS/SSL Automático</strong>
+                        <p>Railway/Render provisionam SSL automaticamente no deploy</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. API -->
+        <section id="api" class="section reveal">
+            <h2><span class="num">07</span> Endpoints da API</h2>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <span class="code-title">API REST — Express.js</span>
+                </div>
+                <pre><span class="cm">// Webhook Twilio (recebe SMS/MMS)</span>
+<span class="kw">POST</span> /sms
+  Body: { Body, From, MessageSid, NumMedia, MediaUrl0 }
+  Response: TwiML XML
+
+<span class="cm">// Listar despesas (com filtros opcionais)</span>
+<span class="kw">GET</span>  /api/expenses?category=alimentação&startDate=2026-01-01
+  Response: [{ id, description, amount, category, expense_date, ... }]
+
+<span class="cm">// Resumo por categoria</span>
+<span class="kw">GET</span>  /api/summary
+  Response: { total: <span class="num">4327.50</span>, byCategory: { alimentação: <span class="num">1280</span>, ... } }
+
+<span class="cm">// Static files (dashboard React)</span>
+<span class="kw">GET</span>  / → serve client/dist/index.html</pre>
+            </div>
+        </section>
+
+        <!-- 8. CUSTOS -->
+        <section id="custos" class="section reveal">
+            <h2><span class="num">08</span> Análise Detalhada de Custos</h2>
+            <p>Estimativa para <strong>1 usuário ativo</strong> com ~200 mensagens/mês (mix de texto e áudio). Baseado
+                nos preços oficiais de fevereiro de 2026.</p>
+
+            <table class="cost-table">
+                <tr>
+                    <th>Serviço</th>
+                    <th>Plano / Tier</th>
+                    <th>Uso Estimado</th>
+                    <th>Custo/Mês</th>
+                </tr>
+                <tr>
+                    <td><strong>Twilio — Número US</strong></td>
+                    <td>Programmable Messaging</td>
+                    <td>1 número dedicado</td>
+                    <td>$1.15</td>
+                </tr>
+                <tr>
+                    <td><strong>Twilio — SMS Inbound</strong></td>
+                    <td>Pay-as-you-go</td>
+                    <td>~200 SMS recebidos</td>
+                    <td>$0.00 <small>(grátis)</small></td>
+                </tr>
+                <tr>
+                    <td><strong>Twilio — SMS Outbound</strong></td>
+                    <td>Pay-as-you-go</td>
+                    <td>~200 confirmações</td>
+                    <td>$1.58 <small>($0.0079/SMS)</small></td>
+                </tr>
+                <tr>
+                    <td><strong>Twilio — MMS Inbound</strong></td>
+                    <td>Pay-as-you-go</td>
+                    <td>~50 áudios recebidos</td>
+                    <td>$0.50 <small>($0.01/MMS)</small></td>
+                </tr>
+                <tr>
+                    <td><strong>Google Gemini 2.0 Flash</strong></td>
+                    <td>Free Tier + Pay-as-you-go</td>
+                    <td>~250 chamadas (texto + áudio)</td>
+                    <td>$0.00 <small>(Free tier: 1500 req/dia)</small></td>
+                </tr>
+                <tr>
+                    <td><strong>Supabase</strong></td>
+                    <td>Free Tier</td>
+                    <td>500MB DB, 1GB storage, 50K Auth users</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td><strong>Railway / Render</strong></td>
+                    <td>Starter Plan</td>
+                    <td>Servidor Node.js 24/7</td>
+                    <td>$5.00</td>
+                </tr>
+                <tr>
+                    <td><strong>Domínio (.com)</strong></td>
+                    <td>Registro anual</td>
+                    <td>spentai.com (rateado)</td>
+                    <td>$1.00</td>
+                </tr>
+                <tr>
+                    <td><strong>GitHub Pages</strong></td>
+                    <td>Free</td>
+                    <td>Showcase/Landing page</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="3"><strong>💰 TOTAL MENSAL ESTIMADO</strong></td>
+                    <td><strong>~$9.23</strong></td>
+                </tr>
+            </table>
+
+            <h3>Projeção por Número de Usuários</h3>
+            <table class="cost-table">
+                <tr>
+                    <th>Usuários</th>
+                    <th>Twilio</th>
+                    <th>Gemini</th>
+                    <th>Supabase</th>
+                    <th>Hosting</th>
+                    <th>Total/Mês</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>$3.23</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                    <td>$5.00</td>
+                    <td><span class="cost-highlight">~$9</span></td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>$7.50</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                    <td>$5.00</td>
+                    <td><span class="cost-highlight">~$13</span></td>
+                </tr>
+                <tr>
+                    <td>50</td>
+                    <td>$25.00</td>
+                    <td>$2.00</td>
+                    <td>$0.00</td>
+                    <td>$7.00</td>
+                    <td><span class="cost-highlight">~$34</span></td>
+                </tr>
+                <tr>
+                    <td>100</td>
+                    <td>$50.00</td>
+                    <td>$5.00</td>
+                    <td>$25.00</td>
+                    <td>$7.00</td>
+                    <td><span class="cost-highlight">~$87</span></td>
+                </tr>
+                <tr>
+                    <td>500</td>
+                    <td>$200.00</td>
+                    <td>$15.00</td>
+                    <td>$25.00</td>
+                    <td>$20.00</td>
+                    <td><span class="cost-highlight">~$260</span></td>
+                </tr>
+            </table>
+
+            <h3>Custo Orçado pelo Cliente</h3>
+            <p>O cliente definiu um orçamento operacional de <strong style="color:var(--accent2)">$20/mês</strong>. Com
+                base na análise acima, esse valor cobre confortavelmente até <strong>~10-15 usuários ativos</strong>
+                utilizando os free tiers disponíveis. A margem permite absorver picos de uso sem exceder o orçamento.
+            </p>
+        </section>
+
+        <!-- 9. ESCALABILIDADE -->
+        <section id="escalabilidade" class="section reveal">
+            <h2><span class="num">09</span> Escalabilidade</h2>
+            <div class="cards">
+                <div class="card">
+                    <div class="icon">📈</div>
+                    <h4>Horizontal</h4>
+                    <p>O servidor Node.js é stateless. Escalar = adicionar instâncias no Railway/Render com load
+                        balancer automático.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🗃️</div>
+                    <h4>Banco de Dados</h4>
+                    <p>Supabase Pro ($25/mês) suporta até 500K linhas com backup diário e connection pooling via
+                        PgBouncer.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">⚙️</div>
+                    <h4>IA</h4>
+                    <p>Gemini 2.0 Flash: 1500 req/dia grátis. Para alto volume, pay-as-you-go com pricing competitivo
+                        (~$0.001/req).</p>
+                </div>
+                <div class="card">
+                    <div class="icon">📱</div>
+                    <h4>Multi-canal</h4>
+                    <p>Arquitetura preparada para adicionar WhatsApp, Telegram e iMessage via Twilio Channels sem
+                        alterar o backend.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p style="margin-bottom:8px"><strong>💸 SpentAI</strong> — Relatório Técnico v1.0</p>
+            <p>Feito por <strong>Finess Tech</strong> · Fevereiro 2026</p>
+            <p style="margin-top:12px">💰 Custo mensal estimado: <strong style="color:var(--accent2)">$20/mês</strong>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // SCROLL REVEAL
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: .1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+        // MOUSE GLOW
+        const g = document.getElementById('glow');
+        let mx = 0, my = 0, gx = 0, gy = 0;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY });
+        (function ag() { gx += (mx - gx) * .08; gy += (my - gy) * .08; g.style.left = gx + 'px'; g.style.top = gy + 'px'; requestAnimationFrame(ag) })();
+
+        // PARTICLES
+        const c = document.getElementById('particles'), x = c.getContext('2d'); let W, H;
+        function rs() { W = c.width = innerWidth; H = c.height = innerHeight } rs(); window.addEventListener('resize', rs);
+        const pts = Array.from({ length: 45 }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.5 + .5, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25, a: Math.random() * .35 + .1 }));
+        function dp() { x.clearRect(0, 0, W, H); pts.forEach(p => { p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = W; if (p.x > W) p.x = 0; if (p.y < 0) p.y = H; if (p.y > H) p.y = 0; x.beginPath(); x.arc(p.x, p.y, p.r, 0, Math.PI * 2); x.fillStyle = `rgba(162,155,254,${p.a})`; x.fill() }); for (let i = 0; i < pts.length; i++)for (let j = i + 1; j < pts.length; j++) { const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.sqrt(dx * dx + dy * dy); if (d < 120) { x.beginPath(); x.moveTo(pts[i].x, pts[i].y); x.lineTo(pts[j].x, pts[j].y); x.strokeStyle = `rgba(108,92,231,${.06 * (1 - d / 120)})`; x.stroke() } } requestAnimationFrame(dp) } dp();
+
+        // CARD TILT
+        document.querySelectorAll('.card').forEach(c => {
+            c.addEventListener('mousemove', e => { const r = c.getBoundingClientRect(), cx = (e.clientX - r.left) / r.width - .5, cy = (e.clientY - r.top) / r.height - .5; c.style.transform = `perspective(500px) rotateY(${cx * 5}deg) rotateX(${-cy * 5}deg) translateY(-3px)` });
+            c.addEventListener('mouseleave', () => { c.style.transform = '' });
+        });
+    </script>
+</body>
+
+</html>

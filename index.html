@@ -1385,6 +1385,7 @@
                 <li><a href="#tech">Tecnologias</a></li>
                 <li><a href="#dashboard">Dashboard</a></li>
                 <li><a href="#roadmap">Roadmap</a></li>
+                <li><a href="relatorio.html" style="color:var(--accent-2)">📋 Relatório</a></li>
             </ul>
             <div class="nav-status">MVP em Desenvolvimento</div>
         </div>
@@ -1470,7 +1471,7 @@
                     <div class="step-num">2</div>
                     <h3>A IA Interpreta</h3>
                     <p>O Gemini AI extrai instantaneamente o estabelecimento, valor, moeda e categoria. Áudios são
-                        transcritos pelo Whisper antes do processamento.</p>
+                        transcritos pelo Gemini antes do processamento.</p>
                 </div>
                 <div class="step-card">
                     <div class="step-num">3</div>
@@ -1508,12 +1509,7 @@
                     <div class="arch-node-label">API Node.js</div>
                 </div>
                 <div class="arch-arrow">→</div>
-                <div class="arch-node">
-                    <div class="arch-node-icon"
-                        style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);">🎙️</div>
-                    <div class="arch-node-label">Whisper AI</div>
-                </div>
-                <div class="arch-arrow">→</div>
+
                 <div class="arch-node">
                     <div class="arch-node-icon"
                         style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3);">🧠</div>
@@ -1652,9 +1648,9 @@
                 <div class="tech-card">
                     <div class="tech-icon" style="background: rgba(245,158,11,0.1);">🎙️</div>
                     <div>
-                        <h4>OpenAI Whisper</h4>
-                        <p>Transcrição de áudio para mensagens de voz. $0.006/min. Permite registrar despesas
-                            simplesmente falando.</p>
+                        <h4>Gemini 2.0 Flash (Multimodal)</h4>
+                        <p>Transcrição de áudio + parsing de despesas em uma única chamada. Substitui Whisper com custo
+                            menor e menor latência.</p>
                     </div>
                 </div>
                 <div class="tech-card">
@@ -1688,8 +1684,8 @@
                     <div class="feature-check">✓</div>
                     <div>
                         <h4>Registro de Despesas por Áudio</h4>
-                        <p>Envie um áudio descrevendo a despesa. O Whisper transcreve e o Gemini interpreta
-                            automaticamente.</p>
+                        <p>Envie um áudio descrevendo a despesa. O Gemini transcreve e interpreta tudo em uma única
+                            chamada multimodal.</p>
                     </div>
                 </div>
                 <div class="feature-item">
@@ -1808,8 +1804,9 @@
                 </div>
                 <div class="roadmap-item">
                     <div class="roadmap-dot done"></div>
-                    <h4>Suporte a Mensagens de Áudio (Whisper)</h4>
-                    <p>Transcrição de mensagens de voz usando OpenAI Whisper API e processamento como texto.</p>
+                    <h4>Suporte a Mensagens de Áudio (Gemini Multimodal)</h4>
+                    <p>Transcrição e parsing de mensagens de voz usando Gemini 2.0 Flash multimodal em chamada única.
+                    </p>
                     <span class="roadmap-tag done">✓ CONCLUÍDO</span>
                 </div>
                 <div class="roadmap-item">
@@ -1842,7 +1839,8 @@
                     SpentAI</strong></p>
             <p>Desenvolvido com Node.js, Twilio, Gemini AI e Supabase</p>
             <p style="margin-top: 12px; font-size: 0.85rem; color: var(--accent-2);">💰 Custo mensal estimado:
-                <strong>$20/mês</strong></p>
+                <strong>$20/mês</strong>
+            </p>
             <p style="margin-top: 20px; font-size: 0.82rem; color: var(--text-secondary);">Feito por <strong
                     style="background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Finess
                     Tech</strong></p>
