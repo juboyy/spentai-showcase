@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpentAI — Track Expenses by Text Message</title>
+    <meta name="description" content="SpentAI lets you track expenses instantly by sending a text or voice message. No app needed. Just text your spending and we handle the rest.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #16161f;
+            --bg-card-hover: #1c1c28;
+            --border: #2a2a3a;
+            --border-glow: #6c5ce7;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --accent-1: #6c5ce7;
+            --accent-2: #a29bfe;
+            --accent-green: #00d68f;
+            --accent-green-dim: #00b87820;
+            --accent-orange: #ff9f43;
+            --accent-red: #ff6b6b;
+            --accent-blue: #4da6ff;
+            --gradient-hero: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #74b9ff 100%);
+            --gradient-card: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(162,155,254,0.04));
+            --shadow-glow: 0 0 60px rgba(108,92,231,0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== NOISE OVERLAY ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* ===== UTILITIES ===== */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .badge-accent {
+            background: rgba(108,92,231,0.15);
+            color: var(--accent-2);
+            border: 1px solid rgba(108,92,231,0.3);
+        }
+        .badge-green {
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            border: 1px solid rgba(0,214,143,0.3);
+        }
+
+        /* ===== NAVBAR ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(10,10,15,0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(42,42,58,0.5);
+        }
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+        }
+        .nav-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,214,143,0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(0,214,143,0); }
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(108,92,231,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+        .hero h1 .gradient-text {
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            background: var(--gradient-hero);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 30px rgba(108,92,231,0.4);
+        }
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(108,92,231,0.55);
+        }
+
+        /* ===== PHONE MOCKUP ===== */
+        .phone-demo {
+            margin: 60px auto 0;
+            max-width: 380px;
+            position: relative;
+        }
+        .phone-frame {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 36px;
+            padding: 12px;
+            box-shadow: var(--shadow-glow), 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .phone-screen {
+            background: #1a1a2e;
+            border-radius: 26px;
+            overflow: hidden;
+        }
+        .phone-notch {
+            width: 120px;
+            height: 28px;
+            background: var(--bg-card);
+            border-radius: 0 0 16px 16px;
+            margin: 0 auto;
+        }
+        .sms-thread {
+            padding: 20px 16px;
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sms-bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            animation: msg-appear 0.5s ease-out both;
+        }
+        .sms-sent {
+            align-self: flex-end;
+            background: #2563eb;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .sms-received {
+            align-self: flex-start;
+            background: #2a2a3a;
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+        .sms-bubble:nth-child(1) { animation-delay: 0.3s; }
+        .sms-bubble:nth-child(2) { animation-delay: 1.2s; }
+        .sms-bubble:nth-child(3) { animation-delay: 2.5s; }
+        .sms-bubble:nth-child(4) { animation-delay: 3.4s; }
+        .sms-bubble:nth-child(5) { animation-delay: 4.5s; }
+        .sms-bubble:nth-child(6) { animation-delay: 5.5s; }
+        @keyframes msg-appear {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .sms-audio {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .audio-wave {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 24px;
+        }
+        .audio-wave span {
+            display: block;
+            width: 3px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.7);
+            animation: wave 1.2s ease-in-out infinite;
+        }
+        .audio-wave span:nth-child(1) { height: 8px; animation-delay: 0s; }
+        .audio-wave span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+        .audio-wave span:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+        .audio-wave span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+        .audio-wave span:nth-child(5) { height: 14px; animation-delay: 0.4s; }
+        .audio-wave span:nth-child(6) { height: 8px; animation-delay: 0.5s; }
+        .audio-wave span:nth-child(7) { height: 18px; animation-delay: 0.6s; }
+        .audio-wave span:nth-child(8) { height: 6px; animation-delay: 0.7s; }
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 60px 0;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 28px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .stat-card:hover {
+            border-color: var(--accent-1);
+            transform: translateY(-4px);
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        /* ===== SECTION HEADERS ===== */
+        .section-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+        .section-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-top: 12px;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-section { padding: 80px 0; }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+        .step-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 28px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .step-card:hover {
+            border-color: rgba(108,92,231,0.5);
+            transform: translateY(-4px);
+        }
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-hero);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .step-card:hover::before { opacity: 1; }
+        .step-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(108,92,231,0.15);
+            color: var(--accent-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        .step-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.65;
+        }
+
+        /* ===== TECH STACK ===== */
+        .tech-section { padding: 80px 0; }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .tech-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: border-color 0.3s;
+        }
+        .tech-card:hover { border-color: rgba(108,92,231,0.4); }
+        .tech-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .tech-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .tech-card p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        /* ===== ARCHITECTURE ===== */
+        .arch-section { padding: 80px 0; }
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+            padding: 48px 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow-x: auto;
+        }
+        .arch-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 16px;
+            min-width: 100px;
+            text-align: center;
+        }
+        .arch-node-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            border: 2px solid var(--border);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .arch-node:hover .arch-node-icon {
+            transform: scale(1.1);
+            border-color: var(--accent-1);
+        }
+        .arch-node-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .arch-arrow {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            padding: 0 4px;
+            animation: arrow-pulse 2s ease-in-out infinite;
+        }
+        @keyframes arrow-pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; color: var(--accent-2); }
+        }
+
+        /* ===== FEATURES DONE ===== */
+        .features-section { padding: 80px 0; }
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: border-color 0.2s;
+        }
+        .feature-item:hover { border-color: rgba(0,214,143,0.4); }
+        .feature-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0,214,143,0.15);
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .feature-item h4 { font-size: 0.9rem; font-weight: 600; }
+        .feature-item p { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+        /* ===== ROADMAP ===== */
+        .roadmap-section { padding: 80px 0; }
+        .roadmap-timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-green), var(--accent-1), var(--text-muted));
+        }
+        .roadmap-item {
+            position: relative;
+            padding: 0 0 40px 24px;
+        }
+        .roadmap-item:last-child { padding-bottom: 0; }
+        .roadmap-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 3px solid;
+        }
+        .roadmap-dot.done { border-color: var(--accent-green); background: var(--accent-green); }
+        .roadmap-dot.current { border-color: var(--accent-1); background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); }
+        .roadmap-dot.next { border-color: var(--text-muted); background: transparent; }
+        .roadmap-item h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+        .roadmap-item p { font-size: 0.85rem; color: var(--text-secondary); }
+        .roadmap-tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+        .roadmap-tag.done { background: rgba(0,214,143,0.15); color: var(--accent-green); }
+        .roadmap-tag.wip { background: rgba(108,92,231,0.15); color: var(--accent-2); }
+        .roadmap-tag.planned { background: rgba(85,85,106,0.2); color: var(--text-muted); }
+
+        /* ===== CODE PREVIEW ===== */
+        .code-section { padding: 80px 0; }
+        .code-block {
+            background: #0d0d14;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+        .code-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .code-dot.red { background: #ff5f56; }
+        .code-dot.yellow { background: #ffbd2e; }
+        .code-dot.green { background: #27c93f; }
+        .code-filename {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 8px;
+        }
+        .code-body {
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            color: #c0c0d8;
+            overflow-x: auto;
+        }
+        .code-body .keyword { color: #c792ea; }
+        .code-body .string { color: #c3e88d; }
+        .code-body .comment { color: #546e7a; }
+        .code-body .func { color: #82aaff; }
+        .code-body .number { color: #ff9f43; }
+        .code-body .emoji { font-family: 'Inter', sans-serif; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 48px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        footer p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        footer a {
+            color: var(--accent-2);
+            text-decoration: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .steps { grid-template-columns: 1fr; }
+            .tech-grid { grid-template-columns: 1fr; }
+            .features-list { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .arch-flow { flex-direction: column; gap: 4px; }
+            .arch-arrow { transform: rotate(90deg); }
+        }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <div class="container">
+        <div class="logo">💸 SpentAI</div>
+        <ul class="nav-links">
+            <li><a href="#how">How it Works</a></li>
+            <li><a href="#tech">Tech Stack</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+        </ul>
+        <div class="nav-status">MVP in Development</div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <span class="badge badge-accent">🚧 Prototype — Feb 2026</span>
+        <h1>Track expenses by<br><span class="gradient-text">sending a text.</span></h1>
+        <p>No app to open. No forms to fill. Just text your expense and our AI handles the rest — categorization, currency detection, and instant tracking.</p>
+        <a href="#how" class="hero-cta">See How It Works ↓</a>
+
+        <!-- Phone Mockup -->
+        <div class="phone-demo">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <div class="sms-thread">
+                        <div class="sms-bubble sms-sent">Starbucks coffee $4.50</div>
+                        <div class="sms-bubble sms-received">✅ Got it! <strong>"Starbucks coffee"</strong> — $4.50 added to <strong>Food & Drink</strong></div>
+                        <div class="sms-bubble sms-sent">Uber to airport $32</div>
+                        <div class="sms-bubble sms-received">✅ Got it! <strong>"Uber to airport"</strong> — $32.00 added to <strong>Transportation</strong></div>
+                        <div class="sms-bubble sms-sent">
+                            <div class="sms-audio">
+                                🎙️
+                                <div class="audio-wave">
+                                    <span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                                0:04
+                            </div>
+                        </div>
+                        <div class="sms-bubble sms-received">✅ Transcribed: <strong>"Netflix subscription"</strong> — $15.99 added to <strong>Entertainment</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="container">
+    <div class="stats reveal">
+        <div class="stat-card">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Services Integrated</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">~2s</div>
+            <div class="stat-label">Processing Time</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">$2</div>
+            <div class="stat-label">Monthly Cost</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Apps to Install</div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-accent">The Flow</span>
+            <h2>How It Works</h2>
+        </div>
+        <div class="steps reveal">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <h3>Send a Text</h3>
+                <p>Send an SMS or audio message to our dedicated number. No app install. No login. Just your phone's native messaging.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <h3>AI Parses It</h3>
+                <p>Gemini AI instantly extracts the merchant, amount, currency, and category. Audio messages are first transcribed via Whisper.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <h3>See Your Spending</h3>
+                <p>View your expenses in a real-time dashboard with charts, filters, and category breakdowns. Available on web and soon on mobile.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="arch" class="arch-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-accent">System Design</span>
+            <h2>Architecture</h2>
+        </div>
+        <div class="arch-flow reveal">
+            <div class="arch-node">
+                <div class="arch-node-icon" style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">📱</div>
+                <div class="arch-node-label">User SMS</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">
+                <div class="arch-node-icon" style="background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);">📡</div>
+                <div class="arch-node-label">Twilio</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">
+                <div class="arch-node-icon" style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">⚡</div>
+                <div class="arch-node-label">Node.js API</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">
+                <div class="arch-node-icon" style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3);">🧠</div>
+                <div class="arch-node-label">Gemini AI</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">
+                <div class="arch-node-icon" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3);">🗄️</div>
+                <div class="arch-node-label">Supabase</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">
+                <div class="arch-node-icon" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);">📊</div>
+                <div class="arch-node-label">Dashboard</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TECH STACK -->
+<section id="tech" class="tech-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-accent">Under the Hood</span>
+            <h2>Tech Stack</h2>
+        </div>
+        <div class="tech-grid reveal">
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(34,197,94,0.1);">⚡</div>
+                <div>
+                    <h4>Node.js + Express</h4>
+                    <p>Lightweight backend server handling Twilio webhooks, API routes, and real-time SMS processing.</p>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(239,68,68,0.1);">📡</div>
+                <div>
+                    <h4>Twilio Programmable Messaging</h4>
+                    <p>Receives SMS/MMS via webhooks. Supports text and media (audio) messages. US number: +1 (251) 241-5676.</p>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(168,85,247,0.1);">🧠</div>
+                <div>
+                    <h4>Google Gemini 2.0 Flash</h4>
+                    <p>Parses natural language into structured expense data. Extracts description, amount, currency, and category with high accuracy.</p>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(59,130,246,0.1);">🗄️</div>
+                <div>
+                    <h4>Supabase (PostgreSQL)</h4>
+                    <p>Cloud-hosted PostgreSQL with real-time capabilities. Stores expenses with full indexing and future RLS support.</p>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(245,158,11,0.1);">🎙️</div>
+                <div>
+                    <h4>OpenAI Whisper (Planned)</h4>
+                    <p>Audio transcription for voice messages. $0.006/min. Enables expense tracking by simply speaking.</p>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(6,182,212,0.1);">📱</div>
+                <div>
+                    <h4>React Native + Expo (Planned)</h4>
+                    <p>Cross-platform mobile app for iOS and Android. Will provide dashboard, history, and smart insights.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES DONE -->
+<section id="features" class="features-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-green">✓ Built</span>
+            <h2>What's Already Working</h2>
+        </div>
+        <div class="features-list reveal">
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>SMS Expense Registration</h4>
+                    <p>Send "Starbucks $4.50" and it's instantly categorized and saved.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>AI-Powered Parsing</h4>
+                    <p>Gemini 2.0 Flash understands contextual expenses, currencies, and implied merchants.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>Real-Time Webhook Processing</h4>
+                    <p>Twilio delivers each SMS instantly to Node.js. No polling — zero delay.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>Duplicate Detection</h4>
+                    <p>Each message is tracked by Twilio MessageSid. No double-counting.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>Multi-Currency Detection</h4>
+                    <p>Detects USD, BRL, EUR, GBP from symbols and context (ISO 4217).</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>Auto-Categorization</h4>
+                    <p>8 categories: Food, Transport, Health, Entertainment, Shopping, Services, Transfers, Other.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>Web Dashboard</h4>
+                    <p>React + Vite dashboard with expense list, filters, and category summary.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div>
+                    <h4>REST API</h4>
+                    <p>GET /api/expenses with filters. GET /api/summary for category totals. Ready for mobile.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CODE PREVIEW -->
+<section class="code-section">
+    <div class="container reveal">
+        <div class="section-header">
+            <span class="badge badge-accent">&lt;/&gt; Code</span>
+            <h2>The AI Brain</h2>
+        </div>
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                <span class="code-filename">services/ai.js — parseExpense()</span>
+            </div>
+            <div class="code-body">
+<span class="comment">// User texts: "Starbucks coffee $4.50"</span><br>
+<span class="keyword">const</span> prompt = <span class="string">`Analyze this SMS and extract expense info:</span><br>
+<span class="string">&nbsp;&nbsp;- description, amount, currency (ISO 4217)</span><br>
+<span class="string">&nbsp;&nbsp;- category: [food, transport, health, ...]`</span>;<br>
+<br>
+<span class="keyword">const</span> result = <span class="keyword">await</span> model.<span class="func">generateContent</span>(prompt);<br>
+<br>
+<span class="comment">// AI returns structured JSON:</span><br>
+<span class="comment">// { description: "Starbucks coffee",</span><br>
+<span class="comment">//   amount: 4.50, currency: "USD",</span><br>
+<span class="comment">//   category: "food" }</span><br>
+<br>
+<span class="keyword">await</span> <span class="func">saveExpense</span>(parsed); <span class="comment">// → Supabase</span><br>
+<span class="emoji">✅</span> <span class="comment">// Reply SMS: "Got it! Starbucks coffee — $4.50"</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap" class="roadmap-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-accent">🗺️ Plan</span>
+            <h2>Roadmap</h2>
+        </div>
+        <div class="roadmap-timeline reveal">
+            <div class="roadmap-item">
+                <div class="roadmap-dot done"></div>
+                <h4>SMS Expense Tracking via Twilio</h4>
+                <p>Receive SMS, parse with Gemini AI, save to Supabase, web dashboard.</p>
+                <span class="roadmap-tag done">✓ COMPLETE</span>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-dot current"></div>
+                <h4>Audio Message Support (Whisper)</h4>
+                <p>Transcribe voice messages using OpenAI Whisper API and process as text.</p>
+                <span class="roadmap-tag wip">IN PROGRESS</span>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-dot current"></div>
+                <h4>Smart SMS Replies</h4>
+                <p>Confirmation messages, spending summaries, and undo commands via SMS.</p>
+                <span class="roadmap-tag wip">IN PROGRESS</span>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-dot next"></div>
+                <h4>Multi-User Authentication</h4>
+                <p>User accounts with phone-based identification. Row Level Security on Supabase.</p>
+                <span class="roadmap-tag planned">PLANNED</span>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-dot next"></div>
+                <h4>React Native Mobile App</h4>
+                <p>Native iOS/Android app with login, dashboard, expense history, and charts.</p>
+                <span class="roadmap-tag planned">PLANNED</span>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-dot next"></div>
+                <h4>Production Deploy</h4>
+                <p>Deploy to Railway/Render with custom domain, SSL, and monitoring.</p>
+                <span class="roadmap-tag planned">PLANNED</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <p style="margin-bottom: 8px;"><strong style="background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">💸 SpentAI</strong></p>
+        <p>Built with Node.js, Twilio, Gemini AI, and Supabase</p>
+        <p style="margin-top: 16px; font-size: 0.72rem;">MVP Prototype — February 2026 &nbsp;·&nbsp; Targeting US Market</p>
+    </div>
+</footer>
+
+<!-- SCROLL REVEAL -->
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
